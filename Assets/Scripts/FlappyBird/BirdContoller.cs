@@ -2,80 +2,84 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BirdContoller : MonoBehaviour
+
+namespace FlappyBird
 {
-    public float jumpVelocity = 3;
-
-    public float upwardAngularSpeed = 360;
-    public float upwardStopAngle;
-    private bool upward;
-    public float downwardAngularSpeed = -180;
-
-    protected new Rigidbody2D rigidbody2D;
-    private Vector3 initialPosition;
-
-
-    private void Awake() {
-        rigidbody2D = GetComponent<Rigidbody2D>();
-        rigidbody2D.simulated = false;
-
-        initialPosition = transform.position;
-    }
-
-    private void OnEnable() {
-        transform.position = initialPosition;
-        rigidbody2D.simulated = true;
-        rigidbody2D.velocity = new Vector2(0, jumpVelocity);
-        rigidbody2D.angularVelocity = downwardAngularSpeed;
-        transform.rotation = Quaternion.Euler(0, 0, upwardStopAngle);
-    }
-
-    void Update()
+    public class BirdContoller : MonoBehaviour
     {
-        UpdateRotation();
+        public float jumpVelocity = 3;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (rigidbody2D.simulated) Jump();
-            else ResetGame();
+        public float upwardAngularSpeed = 360;
+        public float upwardStopAngle;
+        private bool upward;
+        public float downwardAngularSpeed = -180;
+
+        protected new Rigidbody2D rigidbody2D;
+        private Vector3 initialPosition;
+
+
+        private void Awake() {
+            rigidbody2D = GetComponent<Rigidbody2D>();
+            rigidbody2D.simulated = false;
+
+            initialPosition = transform.position;
         }
-    }
 
-    protected void UpdateRotation()
-    {
-        if (upward)
+        private void OnEnable() {
+            transform.position = initialPosition;
+            rigidbody2D.simulated = true;
+            rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+            rigidbody2D.angularVelocity = downwardAngularSpeed;
+            transform.rotation = Quaternion.Euler(0, 0, upwardStopAngle);
+        }
+
+        void Update()
         {
-            if (transform.rotation.eulerAngles.z >= upwardStopAngle)
+            UpdateRotation();
+
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                upward = false;
-                rigidbody2D.angularVelocity = downwardAngularSpeed;
+                if (rigidbody2D.simulated) Jump();
+                else ResetGame();
             }
         }
-    }
 
-    protected void Jump()
-    {
-        rigidbody2D.velocity = new Vector2(0, jumpVelocity);
-        rigidbody2D.angularVelocity = upwardAngularSpeed;
+        protected void UpdateRotation()
+        {
+            if (upward)
+            {
+                if (transform.rotation.eulerAngles.z >= upwardStopAngle)
+                {
+                    upward = false;
+                    rigidbody2D.angularVelocity = downwardAngularSpeed;
+                }
+            }
+        }
 
-        upward = true;
-    }
+        protected void Jump()
+        {
+            rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+            rigidbody2D.angularVelocity = upwardAngularSpeed;
 
-    public void ResetGame()
-    {
-        transform.position = initialPosition;
-        rigidbody2D.simulated = true;
-        rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+            upward = true;
+        }
 
-        transform.rotation = Quaternion.Euler(0, 0, 0);
-        rigidbody2D.angularVelocity = upwardAngularSpeed;
-        upward = true;
-    }
+        public void ResetGame()
+        {
+            transform.position = initialPosition;
+            rigidbody2D.simulated = true;
+            rigidbody2D.velocity = new Vector2(0, jumpVelocity);
 
-    protected virtual void OnCollisionEnter2D(Collision2D other)
-    {
-        rigidbody2D.simulated = false;
-        GameControl.ins.GameOver();
-        enabled = false;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            rigidbody2D.angularVelocity = upwardAngularSpeed;
+            upward = true;
+        }
+
+        protected virtual void OnCollisionEnter2D(Collision2D other)
+        {
+            rigidbody2D.simulated = false;
+            GameControl.ins.GameOver();
+            enabled = false;
+        }
     }
 }
