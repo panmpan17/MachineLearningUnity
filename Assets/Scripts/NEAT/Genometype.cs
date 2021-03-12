@@ -33,7 +33,7 @@ namespace NEAT
             return new Genometype(newNodeGenes, newConnectionGenes);
         }
 
-        private void InputValueIntoNode(NodeGenes node, float value)
+        public void InputValueIntoNode(NodeGenes node, float value)
         {
             switch (node.operatorType)
             {
@@ -44,6 +44,23 @@ namespace NEAT
                     node.value += value;
                     break;
             }
+        }
+        public void InputValueIntoNode(int nodeIndex, float value)
+        {
+            switch (nodeGenes[nodeIndex].operatorType)
+            {
+                case NodeGenes.OperatorType.Multiply:
+                    nodeGenes[nodeIndex].value *= value;
+                    break;
+                case NodeGenes.OperatorType.Plus:
+                    nodeGenes[nodeIndex].value += value;
+                    break;
+            }
+        }
+
+        public float GetNodeValue(int nodeIndex)
+        {
+            return nodeGenes[nodeIndex].Value;
         }
 
         #region Node and Connection
@@ -61,7 +78,7 @@ namespace NEAT
                 }
             }
 
-            public NodeGenes(float _value, Types _type, OperatorType _operatorType=OperatorType.Multiply, OutputMode _outputMode=OutputMode.Normal)
+            public NodeGenes(Types _type, float _value, OperatorType _operatorType=OperatorType.Multiply, OutputMode _outputMode=OutputMode.Normal)
             {
                 value = _value;
                 type = _type;
@@ -71,7 +88,7 @@ namespace NEAT
 
             public enum Types
             {
-                Sensor,
+                Input,
                 Output,
                 Hidden,
             }
