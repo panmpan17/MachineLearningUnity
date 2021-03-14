@@ -8,8 +8,13 @@ namespace FlappyBird
 {
     public class GameControl : MonoBehaviour
     {
-        static public GameControl ins;
+        [SerializeField]
+        private BirdContoller birdContoller;
 
+        [SerializeField]
+        protected float scoreX;
+
+        [Header("Ground control")]
         [SerializeField]
         private GameObject[] groundSetPrefabs;
 
@@ -17,9 +22,6 @@ namespace FlappyBird
         private Vector3 spawnPosition;
         [SerializeField]
         private float distroyX;
-
-        [SerializeField]
-        protected float scoreX;
 
         [SerializeField]
         private float moveSpeed;
@@ -31,9 +33,7 @@ namespace FlappyBird
         [SerializeField]
         private float spawnMinY, spawnMaxY;
 
-        [SerializeField]
-        private BirdContoller birdContoller;
-
+        [Header("UI display")]
         [SerializeField]
         protected GameObject startText;
 
@@ -44,11 +44,10 @@ namespace FlappyBird
         protected List<GameObject> grounds = new List<GameObject>();
 
         protected virtual void Awake() {
-            ins = this;
-            birdContoller.enabled = false;
+            if (birdContoller != null) birdContoller.enabled = false;
         }
 
-        void Update()
+        protected virtual void Update()
         {
             if (!birdContoller.enabled)
             {

@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace NEAT
 {
+    [System.Serializable]
     public class Genometype
     {
         public NodeGenes[] nodeGenes;
@@ -33,42 +34,28 @@ namespace NEAT
             return new Genometype(newNodeGenes, newConnectionGenes);
         }
 
-        public void InputValueIntoNode(NodeGenes node, float value)
+        public override string ToString()
         {
-            switch (node.operatorType)
+            string data = "";
+            for (int i = 0; i < nodeGenes.Length; i++)
             {
-                case NodeGenes.OperatorType.Multiply:
-                    node.value *= value;
-                    break;
-                case NodeGenes.OperatorType.Plus:
-                    node.value += value;
-                    break;
+                data += string.Format("{0} {1}: {2}\n", nodeGenes[i].type, nodeGenes[i].outputMode, nodeGenes[i].value);
             }
-        }
-        public void InputValueIntoNode(int nodeIndex, float value)
-        {
-            switch (nodeGenes[nodeIndex].operatorType)
+            data += "\n";
+            for (int i = 0; i < connectionGenes.Length; i++)
             {
-                case NodeGenes.OperatorType.Multiply:
-                    nodeGenes[nodeIndex].value *= value;
-                    break;
-                case NodeGenes.OperatorType.Plus:
-                    nodeGenes[nodeIndex].value += value;
-                    break;
+                if (connectionGenes[i].enabled)
+                    data += string.Format("{0} > {1}: {2} {3}\n", connectionGenes[i].inputNodeIndex, connectionGenes[i].outputNodeIndex, connectionGenes[i].weight, connectionGenes[i].operatorType);
             }
-        }
-
-        public float GetNodeValue(int nodeIndex)
-        {
-            return nodeGenes[nodeIndex].Value;
+            return data;
         }
 
         #region Node and Connection
+        [System.Serializable]
         public struct NodeGenes
         {
             public Types type;
             public float value;
-            public OperatorType operatorType;
             public OutputMode outputMode;
 
             public float Value
@@ -78,11 +65,10 @@ namespace NEAT
                 }
             }
 
-            public NodeGenes(Types _type, float _value, OperatorType _operatorType=OperatorType.Multiply, OutputMode _outputMode=OutputMode.Normal)
+            public NodeGenes(Types _type, float _value=0, OutputMode _outputMode=OutputMode.Normal)
             {
                 value = _value;
                 type = _type;
-                operatorType = _operatorType;
                 outputMode = _outputMode;
             }
 
@@ -93,12 +79,6 @@ namespace NEAT
                 Hidden,
             }
 
-            public enum OperatorType
-            {
-                Multiply,
-                Plus,
-            }
-
             public enum OutputMode
             {
                 Normal,
@@ -106,19 +86,28 @@ namespace NEAT
             }
         }
 
+        [System.Serializable]
         public struct ConnectionGenens
         {
             public int inputNodeIndex;
             public int outputNodeIndex;
             public float weight;
+            public OperatorType operatorType;
             public bool enabled;
 
-            public ConnectionGenens(int _inputNodeIndex, int _outputNodeIndex, float _weight, bool _enabled=true)
+            public ConnectionGenens(int _inputNodeIndex, int _outputNodeIndex, float _weight, OperatorType _operatorType=OperatorType.Multiply, bool _enabled=true)
             {
                 inputNodeIndex = _inputNodeIndex;
                 outputNodeIndex = _outputNodeIndex;
                 weight = _weight;
+                operatorType = _operatorType;
                 enabled = _enabled;
+            }
+
+            public enum OperatorType
+            {
+                Multiply,
+                Plus,
             }
         }
         #endregion
