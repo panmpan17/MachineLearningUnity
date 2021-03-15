@@ -1220,8 +1220,12 @@ MonoBehaviour:
   scoreText: {fileID: 1742788419}
   birdsCollection: {fileID: 552772554}
   birdPrefab: {fileID: 3531945777408210358, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
-  batchBirdCount: 100
-  x: -1.5
+  batchBirdCount: 50
+  scoreRequire: 50
+  maxnimumGenerationCount: 20
+  x: -1.8
+  genomeRecordFileName: result.data
+  forShow: 0
 --- !u!4 &1594724059
 Transform:
   m_ObjectHideFlags: 0

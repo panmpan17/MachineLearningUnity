@@ -9,29 +9,29 @@ namespace FlappyBird
     public class GameControl : MonoBehaviour
     {
         [SerializeField]
-        private BirdContoller birdContoller;
+        protected BirdContoller birdContoller;
 
         [SerializeField]
         protected float scoreX;
 
         [Header("Ground control")]
         [SerializeField]
-        private GameObject[] groundSetPrefabs;
+        protected GameObject[] groundSetPrefabs;
 
         [SerializeField]
-        private Vector3 spawnPosition;
+        protected Vector3 spawnPosition;
         [SerializeField]
-        private float distroyX;
+        protected float distroyX;
 
         [SerializeField]
-        private float moveSpeed;
+        protected float moveSpeed;
 
         [SerializeField]
-        private float spawnGap;
-        private float spawnTimer;
+        protected float spawnGap;
+        protected float spawnTimer;
 
         [SerializeField]
-        private float spawnMinY, spawnMaxY;
+        protected float spawnMinY, spawnMaxY;
 
         [Header("UI display")]
         [SerializeField]
@@ -39,7 +39,7 @@ namespace FlappyBird
 
         [SerializeField]
         protected TextMeshProUGUI scoreText;
-        private int score;
+        protected int score;
 
         protected List<GameObject> grounds = new List<GameObject>();
 

@@ -41,19 +41,53 @@ namespace FlappyBird
         /// </summary>
         private float m_batchStartTime;
 
+        public int scoreRequire;
+        public float maxnimumGenerationCount;
+        private float m_generationCount;
+
         /// <summary>
         /// The minimum x of the ground become irrelevant
         /// </summary>
         public float x;
 
+        public string genomeRecordFileName;
+        public bool forShow;
+
         private void Start()
         {
-            startText.gameObject.SetActive(false);
-
-            // Start new batch of birds
             m_birds = new GenomeControlBird[batchBirdCount];
             m_birdResults = new float[batchBirdCount];
 
+            startText.gameObject.SetActive(false);
+
+            // Start new batch of birds
+            if (genomeRecordFileName != "")
+            {
+                try {
+                    Genometype genome = SavingSystem.GetGenome(genomeRecordFileName);
+
+                    if (forShow)
+                    {
+                        // Only populate one bird
+                        batchBirdCount = 1;
+                    }
+
+                    PopulateByEvolveFromGenome(SavingSystem.GetGenome(genomeRecordFileName));
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                    StartFromScratch();
+                }
+            }
+            else StartFromScratch();
+            
+
+            m_batchStartTime = Time.unscaledTime;
+            base.ResetGame();
+        }
+
+        protected void StartFromScratch()
+        {
             for (int i = 0; i < batchBirdCount; i++)
             {
                 m_birds[i] = Instantiate<GenomeControlBird>(birdPrefab);
@@ -78,15 +112,30 @@ namespace FlappyBird
                 m_birds[i].Prepare(this, new Genometype(nodes, connections));
             }
 
-            m_batchStartTime = Time.unscaledTime;
-            base.ResetGame();
+            m_generationCount++;
+        }
+
+        protected void PopulateByEvolveFromGenome(Genometype data)
+        {
+            m_birds[0] = Instantiate<GenomeControlBird>(birdPrefab);
+            m_birds[0].Prepare(this, data);
+            m_birds[0].transform.SetParent(birdsCollection);
+
+            for (int i = 1; i < batchBirdCount; i++)
+            {
+                m_birds[i] = Instantiate<GenomeControlBird>(birdPrefab);
+                m_birds[i].Prepare(this, ChangeWeightInGenome(data));
+                m_birds[i].transform.SetParent(birdsCollection);
+            }
+
+            m_generationCount++;
         }
 
         protected override void Update()
         {
             UpdateGround();
 
-            // Chose the close ground
+            // Chose the closest ground
             m_cloestGround = grounds[0].transform;
             float bestDistance = m_cloestGround.transform.position.x - x;
             for (int i = 0; i < grounds.Count; i++)
@@ -98,6 +147,10 @@ namespace FlappyBird
                     m_cloestGround = grounds[i].transform;
                 }
             }
+
+            // Check is the score reach
+            if (score >= scoreRequire)
+                StopTheTraining();
         }
 
         /// <summary>
@@ -142,26 +195,16 @@ namespace FlappyBird
                 Destroy(m_birds[i].gameObject);
             }
 
-            // if (m_generationCount % 5 == 0)
-            //     SavingSystem.SaveData(bestData, string.Format("generation-{0}.json", m_generationCount));
-
-            // Preserve the best of last batch to the next batch
-            m_birds[0] = Instantiate<GenomeControlBird>(birdPrefab);
-            m_birds[0].Prepare(this, bestData);
-            m_birds[0].transform.SetParent(birdsCollection);
-
-            for (int i = 1; i < batchBirdCount; i++)
-            {
-                m_birds[i] = Instantiate<GenomeControlBird>(birdPrefab);
-                m_birds[i].Prepare(this, EvolveGenome(bestData));
-                // Debug.Log(m_birds[i].GenomeData);
-                m_birds[i].transform.SetParent(birdsCollection);
-            }
+            PopulateByEvolveFromGenome(bestData);
 
             m_batchStartTime = Time.unscaledTime;
+
+            // Check maximum generation is reach
+            if (m_generationCount >= maxnimumGenerationCount)
+                StopTheTraining();
         }
 
-        private Genometype EvolveGenome(Genometype genome)
+        private Genometype ChangeWeightInGenome(Genometype genome)
         {
             Genometype newGenome = genome.Clone();
 
@@ -178,7 +221,11 @@ namespace FlappyBird
             for (int i = 0; i < m_birds.Length; i++)
             {
                 if (m_birds[i].gameObject.activeSelf)
+                {
                     SavingSystem.StoreGenome("result.data", m_birds[i].GenomeData);
+                    Debug.Log(Application.persistentDataPath);
+                    break;
+                }
             }
 
             // Quit the game
