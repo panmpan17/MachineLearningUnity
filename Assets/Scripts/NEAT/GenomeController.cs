@@ -24,24 +24,15 @@ namespace NEAT
         #region Input
         public void Input(float[] inputDatas)
         {
-            int nodeIndex = 0;
             for (int i = 0; i < inputDatas.Length; i++)
             {
-                bool breaked = false;
-                while (nodeIndex < m_genome.nodeGenes.Length)
+                for (int e = 0; e < m_genome.nodeGenes.Length; e++)
                 {
-                    if (m_genome.nodeGenes[nodeIndex].type == Genometype.NodeGenes.Types.Input)
+                    if (m_genome.nodeGenes[e].type == Genometype.NodeGenes.Types.Input && m_genome.nodeGenes[e].IOIndex == i)
                     {
-                        m_genome.nodeGenes[nodeIndex].value = inputDatas[i];
-
-                        nodeIndex++;
-                        breaked = true;
-                        break;
+                        m_genome.nodeGenes[e].value = inputDatas[i];
                     }
-                    nodeIndex++;
                 }
-                
-                if (!breaked) throw new System.IndexOutOfRangeException("There's not enough input node");
             }
         }
         #endregion

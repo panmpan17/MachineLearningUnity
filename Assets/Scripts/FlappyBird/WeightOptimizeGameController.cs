@@ -61,9 +61,9 @@ namespace FlappyBird
 
                 // Setup the genome
                 Genometype.NodeGenes[] nodes = new Genometype.NodeGenes[] {
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input),
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input),
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input),
+                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 1),
+                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 5),
+                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 7),
                     new Genometype.NodeGenes(Genometype.NodeGenes.Types.Hidden),
                     new Genometype.NodeGenes(Genometype.NodeGenes.Types.Output),
                 };
@@ -171,6 +171,21 @@ namespace FlappyBird
             }
 
             return newGenome;
+        }
+
+        public void StopTheTraining()
+        {
+            for (int i = 0; i < m_birds.Length; i++)
+            {
+                if (m_birds[i].gameObject.activeSelf)
+                    SavingSystem.StoreGenome("result.data", m_birds[i].GenomeData);
+            }
+
+            // Quit the game
+            Application.Quit();
+            #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+            #endif
         }
     }
 }

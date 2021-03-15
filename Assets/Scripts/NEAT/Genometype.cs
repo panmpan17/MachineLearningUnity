@@ -19,12 +19,14 @@ namespace NEAT
 
         public Genometype Clone()
         {
+            // Copy the nodes
             NodeGenes[] newNodeGenes = new NodeGenes[nodeGenes.Length];
             for (int i = 0; i < nodeGenes.Length; i++)
             {
                 newNodeGenes[i] = nodeGenes[i];
             }
 
+            // Copy the connection
             ConnectionGenens[] newConnectionGenes = new ConnectionGenens[connectionGenes.Length];
             for (int i = 0; i < connectionGenes.Length; i++)
             {
@@ -37,11 +39,16 @@ namespace NEAT
         public override string ToString()
         {
             string data = "";
+
+            // Loop through the nodes, and turn its data into string
             for (int i = 0; i < nodeGenes.Length; i++)
             {
                 data += string.Format("{0} {1}: {2}\n", nodeGenes[i].type, nodeGenes[i].outputMode, nodeGenes[i].value);
             }
+
             data += "\n";
+
+            // Loop through the connections, and turn its data into string
             for (int i = 0; i < connectionGenes.Length; i++)
             {
                 if (connectionGenes[i].enabled)
@@ -54,9 +61,26 @@ namespace NEAT
         [System.Serializable]
         public struct NodeGenes
         {
+            /// <summary>
+            /// The type of this node
+            /// </summary>
             public Types type;
-            public float value;
+
+            /// <summary>
+            /// How to output the value
+            /// </summary>
             public OutputMode outputMode;
+
+            /// <summary>
+            /// The input or output index
+            /// </summary>
+            public int IOIndex;
+
+            /// <summary>
+            /// The value store in the node
+            /// </summary>
+            [System.NonSerialized]
+            public float value;
 
             public float Value
             {
@@ -65,11 +89,12 @@ namespace NEAT
                 }
             }
 
-            public NodeGenes(Types _type, float _value=0, OutputMode _outputMode=OutputMode.Normal)
+            public NodeGenes(Types _type, OutputMode _outputMode=OutputMode.Normal, int _IOIndex=0)
             {
-                value = _value;
                 type = _type;
                 outputMode = _outputMode;
+                IOIndex = _IOIndex;
+                value = 0;
             }
 
             public enum Types
@@ -89,11 +114,37 @@ namespace NEAT
         [System.Serializable]
         public struct ConnectionGenens
         {
+            public static int InnovationNumber = 0;
+
+            /// <summary>
+            /// The index of the input node in the genome
+            /// </summary>
             public int inputNodeIndex;
+
+            /// <summary>
+            /// The index of the output node in the genome
+            /// </summary>
             public int outputNodeIndex;
+
+            /// <summary>
+            /// The weight of this connection
+            /// </summary>
             public float weight;
+
+            /// <summary>
+            /// How to calculate the weight
+            /// </summary>
             public OperatorType operatorType;
+
+            /// <summary>
+            /// Wether this connection is avalible
+            /// </summary>
             public bool enabled;
+
+            /// <summary>
+            /// The innvation number of this connection, use to  line up genome when cross over
+            /// </summary>
+            public int innovationNumber;
 
             public ConnectionGenens(int _inputNodeIndex, int _outputNodeIndex, float _weight, OperatorType _operatorType=OperatorType.Multiply, bool _enabled=true)
             {
@@ -102,6 +153,8 @@ namespace NEAT
                 weight = _weight;
                 operatorType = _operatorType;
                 enabled = _enabled;
+
+                innovationNumber = InnovationNumber++;
             }
 
             public enum OperatorType
