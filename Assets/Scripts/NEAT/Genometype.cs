@@ -17,6 +17,10 @@ namespace NEAT
             connectionGenes = _connectionGenes;
         }
 
+        /// <summary>
+        /// Make a clone of the genome
+        /// </summary>
+        /// <returns>The new genome</returns>
         public Genometype Clone()
         {
             // Copy the nodes

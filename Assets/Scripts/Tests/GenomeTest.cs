@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 using NEAT;
 
 public class GenomeTest
@@ -54,5 +51,49 @@ public class GenomeTest
         controller.Input(new float[] {0.9f});
         controller.StartProcess();
         Assert.AreEqual(controller.GetOutput(0), 1.09f);
+    }
+
+    [Test]
+    public void GenomeConnectionMutation()
+    {
+        Genometype.NodeGenes[] nodes = new Genometype.NodeGenes[] {
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 0),
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 0),
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Hidden),
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Output),
+        };
+
+        GenomeMutationController controller = new GenomeMutationController(new Genometype(nodes, new Genometype.ConnectionGenens[0] { }));
+
+        controller.MutateByAddingConnection();
+
+        for (int i = 0; i < controller.mutations.Count; i++)
+        {
+            Debug.Log(controller.mutations[i]);
+        }
+    }
+
+    [Test]
+    public void GenomeNodeMutation()
+    {
+        Genometype.NodeGenes[] nodes = new Genometype.NodeGenes[] {
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 0),
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 0),
+            new Genometype.NodeGenes(Genometype.NodeGenes.Types.Output),
+        };
+
+        Genometype.ConnectionGenens[] connections = new Genometype.ConnectionGenens[] {
+            new Genometype.ConnectionGenens(0, 2, 0.123f),
+            new Genometype.ConnectionGenens(1, 2, 3f),
+        };
+
+        GenomeMutationController controller = new GenomeMutationController(new Genometype(nodes, connections));
+
+        controller.MutateByInsertNodeBetweenConnection();
+
+        for (int i = 0; i < controller.mutations.Count; i++)
+        {
+            Debug.Log(controller.mutations[i]);
+        }
     }
 }
