@@ -9,6 +9,8 @@ namespace FlappyBird
     public interface IBirdOverCallback
     {
         Transform CloestGround { get; }
+        GenomeControlBird BirdPrefab { get; }
+        float GameStartTime { get; }
 
         void BirdOver(GenomeControlBird bird);
     }
@@ -18,17 +20,13 @@ namespace FlappyBird
         [Header("Machine Learning")]
         public Transform birdsCollection;
         public GenomeControlBird birdPrefab;
+        public GenomeControlBird BirdPrefab {
+            get { return birdPrefab; }
+        }
+
         public int batchBirdCount;
 
-        /// <summary>
-        /// Current batch of birds
-        /// </summary>
-        private GenomeControlBird[] m_birds;
-
-        /// <summary>
-        /// The result of current batch of birds
-        /// </summary>
-        private float[] m_birdResults;
+        private WeightOptimize m_weightOptimizer;
 
         /// <summary>
         /// The closest ground ahead of the bird
@@ -53,81 +51,54 @@ namespace FlappyBird
         public string genomeRecordFileName;
         public bool forShow;
 
+        public float GameStartTime {
+            get { return m_batchStartTime; }
+        }
+
         private void Start()
         {
-            m_birds = new GenomeControlBird[batchBirdCount];
-            m_birdResults = new float[batchBirdCount];
-
             startText.gameObject.SetActive(false);
 
-            // Start new batch of birds
-            if (genomeRecordFileName != "")
-            {
-                try {
-                    Genometype genome = SavingSystem.GetGenome(genomeRecordFileName);
+            // Only populate one bird if for show is on
+            m_weightOptimizer = new WeightOptimize(this, forShow? 1: batchBirdCount);
 
-                    if (forShow)
-                    {
-                        // Only populate one bird
-                        batchBirdCount = 1;
-                    }
 
-                    PopulateByEvolveFromGenome(SavingSystem.GetGenome(genomeRecordFileName));
-                }
-                catch (System.IO.FileNotFoundException)
-                {
-                    StartFromScratch();
-                }
+            // Start new batch of birds, if record file can be load use record genome
+            try {
+                m_weightOptimizer.InsertGenome(SavingSystem.GetGenome(genomeRecordFileName));
             }
-            else StartFromScratch();
+            catch (System.IO.FileNotFoundException)
+            {
+                StartFromScratch();
+            }
             
-
             m_batchStartTime = Time.unscaledTime;
             base.ResetGame();
         }
 
         protected void StartFromScratch()
         {
-            for (int i = 0; i < batchBirdCount; i++)
-            {
-                m_birds[i] = Instantiate<GenomeControlBird>(birdPrefab);
-                m_birds[i].transform.SetParent(birdsCollection);
+            Genometype.NodeGenes[] nodes = new Genometype.NodeGenes[] {
+                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 1),
+                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 5),
+                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 7),
+                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Hidden),
+                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Output),
+            };
 
-                // Setup the genome
-                Genometype.NodeGenes[] nodes = new Genometype.NodeGenes[] {
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 1),
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 5),
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 7),
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Hidden),
-                    new Genometype.NodeGenes(Genometype.NodeGenes.Types.Output),
-                };
+            Genometype.ConnectionGenens[] connections = new Genometype.ConnectionGenens[] {
+                new Genometype.ConnectionGenens(0, 3, Random.Range(-10f, 10f)),
+                new Genometype.ConnectionGenens(1, 3, Random.Range(-10f, 10f)),
+                new Genometype.ConnectionGenens(2, 3, Random.Range(-10f, 10f)),
+                new Genometype.ConnectionGenens(3, 4, Random.Range(-10f, 10f), Genometype.ConnectionGenens.OperatorType.Plus),
+            };
 
-                Genometype.ConnectionGenens[] connections = new Genometype.ConnectionGenens[] {
-                    new Genometype.ConnectionGenens(0, 3, Random.Range(-10f, 10f)),
-                    new Genometype.ConnectionGenens(1, 3, Random.Range(-10f, 10f)),
-                    new Genometype.ConnectionGenens(2, 3, Random.Range(-10f, 10f)),
-                    new Genometype.ConnectionGenens(3, 4, Random.Range(-10f, 10f), Genometype.ConnectionGenens.OperatorType.Plus),
-                };
-
-                m_birds[i].Prepare(this, new Genometype(nodes, connections));
-            }
-
-            m_generationCount++;
+            m_weightOptimizer.InsertGenome(new Genometype(nodes, connections));
         }
 
         protected void PopulateByEvolveFromGenome(Genometype data)
         {
-            m_birds[0] = Instantiate<GenomeControlBird>(birdPrefab);
-            m_birds[0].Prepare(this, data);
-            m_birds[0].transform.SetParent(birdsCollection);
-
-            for (int i = 1; i < batchBirdCount; i++)
-            {
-                m_birds[i] = Instantiate<GenomeControlBird>(birdPrefab);
-                m_birds[i].Prepare(this, ChangeWeightInGenome(data));
-                m_birds[i].transform.SetParent(birdsCollection);
-            }
-
+            m_weightOptimizer.PopulateByEvolveFromGenome();
             m_generationCount++;
         }
 
@@ -159,21 +130,8 @@ namespace FlappyBird
         /// <param name="bird"></param>
         public void BirdOver(GenomeControlBird bird)
         {
-            bool allDead = true;
-            for (int i = 0; i < batchBirdCount; i++)
-            {
-                if (m_birds[i] == bird)
-                {
-                    m_birdResults[i] = Time.unscaledTime - m_batchStartTime;
-                }
-
-                if (m_birds[i].gameObject.activeSelf) allDead = false;
-            }
-
-            if (allDead)
-            {
+            if (m_weightOptimizer.BirdOver(bird))
                 ResetGame();
-            }
         }
 
         public override void ResetGame()
@@ -181,21 +139,8 @@ namespace FlappyBird
             base.ResetGame();
 
             // Prepare new batch
-            // Find best data from current batch of birds
-            Genometype bestData = m_birds[0].GenomeData;
-            float bestTime = 0;
-
-            for (int i = 0; i < batchBirdCount; i++)
-            {
-                if (m_birdResults[i] > bestTime)
-                {
-                    bestData = m_birds[i].GenomeData;
-                    bestTime = m_birdResults[i];
-                }
-                Destroy(m_birds[i].gameObject);
-            }
-
-            PopulateByEvolveFromGenome(bestData);
+            m_weightOptimizer.FindBestData();
+            m_weightOptimizer.PopulateByEvolveFromGenome();
 
             m_batchStartTime = Time.unscaledTime;
 
@@ -204,28 +149,12 @@ namespace FlappyBird
                 StopTheTraining();
         }
 
-        private Genometype ChangeWeightInGenome(Genometype genome)
-        {
-            Genometype newGenome = genome.Clone();
-
-            for (int i = 0; i < newGenome.connectionGenes.Length; i++)
-            {
-                newGenome.connectionGenes[i].weight += Random.Range(-1f, 1f);
-            }
-
-            return newGenome;
-        }
-
         public void StopTheTraining()
         {
-            for (int i = 0; i < m_birds.Length; i++)
+            Genometype genome;
+            if (m_weightOptimizer.FindAliveData(out genome))
             {
-                if (m_birds[i].gameObject.activeSelf)
-                {
-                    SavingSystem.StoreGenome("result.data", m_birds[i].GenomeData);
-                    Debug.Log(Application.persistentDataPath);
-                    break;
-                }
+                SavingSystem.StoreGenome("best-data", genome);
             }
 
             // Quit the game
