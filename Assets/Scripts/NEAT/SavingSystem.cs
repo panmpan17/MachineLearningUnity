@@ -15,7 +15,7 @@ namespace NEAT
         /// <param name="fileName">The name of the file</param>
         /// <param name="genome">The genome struct</param>
         /// <param name="useJson">Use json format to store data</param>
-        public static void StoreGenome(string fileName, Genometype genome, bool useJson=false)
+        public static void SaveData<T>(string fileName, T genome, bool useJson=false)
         {
             if (useJson)
             {
@@ -37,7 +37,7 @@ namespace NEAT
         /// <param name="fileName">The name of the file</param>
         /// <param name="useJson">Use json format to read the data</param>
         /// <returns>The genome structure</returns>
-        public static Genometype GetGenome(string fileName, bool useJson=false)
+        public static T GetGenome<T>(string fileName, bool useJson=false)
         {
             if (useJson)
             {
@@ -45,14 +45,14 @@ namespace NEAT
                 string text = reader.ReadToEnd();
                 reader.Close();
 
-                return JsonUtility.FromJson<Genometype>(text);
+                return JsonUtility.FromJson<T>(text);
             }
             else
             {
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
 
                 FileStream stream = new FileStream(Path.Combine(Application.persistentDataPath, fileName), FileMode.Open);
-                Genometype data = (Genometype)binaryFormatter.Deserialize(stream);
+                T data = (T)binaryFormatter.Deserialize(stream);
                 stream.Close();
 
                 return data;

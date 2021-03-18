@@ -8,8 +8,35 @@ namespace NEAT
     [System.Serializable]
     public class Genometype
     {
+        public static bool Compare(Genometype genome1, Genometype genome2)
+        {
+            if (genome1.connectionGenes == null || genome2.connectionGenes == null)
+                return genome1.connectionGenes == null && genome2.connectionGenes == null;
+
+            for (int i = 0; i < genome1.connectionGenes.Length; i++)
+            {
+                bool matched = true;
+                for (int e = 0; e < genome2.connectionGenes.Length; e++)
+                {
+                    if (genome1.connectionGenes[i].innovationNumber == genome2.connectionGenes[i].innovationNumber)
+                    {
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) return false;
+            }
+            return true;
+        }
+
         public NodeGenes[] nodeGenes;
         public ConnectionGenens[] connectionGenes;
+
+        public Genometype(NodeGenes[] _nodeGenes)
+        {
+            nodeGenes = _nodeGenes;
+            connectionGenes = new ConnectionGenens[0];
+        }
 
         public Genometype(NodeGenes[] _nodeGenes, ConnectionGenens[] _connectionGenes)
         {

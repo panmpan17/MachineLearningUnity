@@ -38,6 +38,10 @@ namespace FlappyBird
         /// Record of the time when new batch start
         /// </summary>
         private float m_batchStartTime;
+        public float GameStartTime
+        {
+            get { return m_batchStartTime; }
+        }
 
         public int scoreRequire;
         public float maxnimumGenerationCount;
@@ -51,10 +55,6 @@ namespace FlappyBird
         public string genomeRecordFileName;
         public bool forShow;
 
-        public float GameStartTime {
-            get { return m_batchStartTime; }
-        }
-
         private void Start()
         {
             startText.gameObject.SetActive(false);
@@ -65,7 +65,7 @@ namespace FlappyBird
 
             // Start new batch of birds, if record file can be load use record genome
             try {
-                m_weightOptimizer.InsertGenome(SavingSystem.GetGenome(genomeRecordFileName));
+                m_weightOptimizer.InsertGenome(SavingSystem.GetGenome<Genometype>(genomeRecordFileName));
             }
             catch (System.IO.FileNotFoundException)
             {
@@ -121,7 +121,7 @@ namespace FlappyBird
 
             // Check is the score reach
             if (score >= scoreRequire)
-                StopTheTraining();
+                StopTraining();
         }
 
         /// <summary>
@@ -130,7 +130,8 @@ namespace FlappyBird
         /// <param name="bird"></param>
         public void BirdOver(GenomeControlBird bird)
         {
-            if (m_weightOptimizer.BirdOver(bird))
+            m_weightOptimizer.BirdOver(bird);
+            if (m_weightOptimizer.AllDead)
                 ResetGame();
         }
 
@@ -146,15 +147,15 @@ namespace FlappyBird
 
             // Check maximum generation is reach
             if (m_generationCount >= maxnimumGenerationCount)
-                StopTheTraining();
+                StopTraining();
         }
 
-        public void StopTheTraining()
+        public void StopTraining()
         {
             Genometype genome;
             if (m_weightOptimizer.FindAliveData(out genome))
             {
-                SavingSystem.StoreGenome("best-data", genome);
+                SavingSystem.SaveData<Genometype>("best-data", genome);
             }
 
             // Quit the game

@@ -23,6 +23,8 @@ namespace FlappyBird
         private List<Genometype> m_historyGenomes;
 
         private IBirdOverCallback gameController;
+        
+        public bool AllDead;
 
         public WeightOptimize(IBirdOverCallback _gameController, int birdCount)
         {
@@ -34,15 +36,19 @@ namespace FlappyBird
             gameController = _gameController;
         }
 
-        public void InsertGenome(Genometype genome)
+        public void InsertGenome(Genometype genome, bool fullyRandom=true)
         {
             m_historyGenomes.Add(genome);
 
-            for (int i = 0; i < m_birdCount; i++)
+            m_birds[0] = GameObject.Instantiate<GenomeControlBird>(gameController.BirdPrefab);
+            // m_birds[i].transform.SetPraent(birdsCollection);
+            m_birds[0].Prepare(gameController, genome);
+
+            for (int i = 1; i < m_birdCount; i++)
             {
                 m_birds[i] = GameObject.Instantiate<GenomeControlBird>(gameController.BirdPrefab);
                 // m_birds[i].transform.SetPraent(birdsCollection);
-                m_birds[i].Prepare(gameController, ChangeWeightInGenome(genome, true));
+                m_birds[i].Prepare(gameController, ChangeWeightInGenome(genome, fullyRandom: fullyRandom));
             }
         }
 
@@ -75,10 +81,10 @@ namespace FlappyBird
             return newGenome;
         }
 
-        public bool BirdOver(GenomeControlBird bird)
+        public void BirdOver(GenomeControlBird bird)
         {
+            AllDead = true;
 
-            bool allDead = true;
             for (int i = 0; i < m_birdCount; i++)
             {
                 if (m_birds[i] == bird)
@@ -86,10 +92,8 @@ namespace FlappyBird
                     m_birdResults[i] = Time.unscaledTime - gameController.GameStartTime;
                 }
 
-                if (m_birds[i].gameObject.activeSelf) allDead = false;
+                if (m_birds[i].gameObject.activeSelf) AllDead = false;
             }
-
-            return allDead;
         }
 
         public void FindBestData()
@@ -110,6 +114,23 @@ namespace FlappyBird
             m_historyGenomes.Add(bestData);
         }
 
+
+        public GenomeScore ExtractBestData()
+        {
+            GenomeScore genomeScore = new GenomeScore(m_birds[0].GenomeData, m_birdResults[0]);
+
+            for (int i = 1; i < m_birdCount; i++)
+            {
+                if (m_birdResults[i] > genomeScore.time)
+                {
+                    genomeScore = new GenomeScore(m_birds[i].GenomeData, m_birdResults[i]);
+                }
+                GameObject.Destroy(m_birds[i].gameObject);
+            }
+
+            return genomeScore;
+        }
+
         public bool FindAliveData(out Genometype genome)
         {
             for (int i = 0; i < m_birds.Length; i++)
@@ -123,6 +144,18 @@ namespace FlappyBird
 
             genome = new Genometype(null, null);
             return false;
+        }
+
+        public struct GenomeScore
+        {
+            public Genometype genome;
+            public float time;
+
+            public GenomeScore(Genometype _genome, float _time)
+            {
+                genome = _genome;
+                time = _time;
+            }
         }
     }
 }
