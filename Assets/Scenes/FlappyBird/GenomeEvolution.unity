@@ -1238,6 +1238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalCamera: {fileID: 586171337}
   noRenderersCamera: {fileID: 657506686}
+  nodRenderersOnStart: 1
 --- !u!114 &917810502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1960,7 +1961,7 @@ GameObject:
   - component: {fileID: 1594724059}
   - component: {fileID: 1594724060}
   m_Layer: 0
-  m_Name: Manager
+  m_Name: Stage1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1998,6 +1999,7 @@ MonoBehaviour:
   - {fileID: 8868567236326683746, guid: 776f98b91a59942918cb13694f41d923, type: 3}
   - {fileID: 8868567236326683746, guid: c13ab38741d3846c4aa9359c49e75cf0, type: 3}
   - {fileID: 8868567236326683746, guid: eebf7ae824d8149378e4deb3d9e1eeda, type: 3}
+  spawnCount: 5
   spawnPosition: {x: 7, y: 0, z: 0}
   distroyX: -8
   moveSpeed: -3
@@ -2009,13 +2011,13 @@ MonoBehaviour:
   birdsCollection: {fileID: 552772554}
   birdPrefab: {fileID: 3531945777408210358, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
   maxGenomeAtATime: 30
-  genomeBirdCount: 50
+  genomeBirdCount: 30
   genomeMaxGeneration: 6
   scoreRequire: 100
   x: -1.8
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}
-  recordFileName: compound-data
+  recordFileName: old-compound-data
 --- !u!1 &1742788417
 GameObject:
   m_ObjectHideFlags: 0

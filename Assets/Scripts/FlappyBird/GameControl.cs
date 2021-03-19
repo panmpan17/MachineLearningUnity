@@ -17,6 +17,9 @@ namespace FlappyBird
         [Header("Ground control")]
         [SerializeField]
         protected GameObject[] groundSetPrefabs;
+        public int spawnCount;
+        private int spawnCounting;
+        private int groundIndex;
 
         [SerializeField]
         protected Vector3 spawnPosition;
@@ -91,8 +94,17 @@ namespace FlappyBird
         {
             spawnTimer = 0;
 
-            int index = Random.Range(0, groundSetPrefabs.Length);
-            GameObject newGround = Instantiate(groundSetPrefabs[index]);
+            if (++spawnCounting > spawnCount)
+            {
+                spawnCounting = 0;
+                if (++groundIndex >= groundSetPrefabs.Length)
+                {
+                    groundIndex = 0;
+                }
+            }
+
+            // int index = Random.Range(0, groundSetPrefabs.Length);
+            GameObject newGround = Instantiate(groundSetPrefabs[groundIndex]);
 
             Vector3 position = spawnPosition;
             position.y = Random.Range(spawnMinY, spawnMaxY);
@@ -108,6 +120,8 @@ namespace FlappyBird
 
         public virtual void ResetGame()
         {
+            spawnCounting = groundIndex = 0;
+            
             startText.SetActive(false);
             if (birdContoller != null) birdContoller.enabled = true;
             score = 0;

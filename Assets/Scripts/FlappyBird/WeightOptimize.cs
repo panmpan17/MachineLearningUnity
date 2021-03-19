@@ -7,7 +7,6 @@ namespace FlappyBird
 {
     public class WeightOptimize
     {
-        [SerializeField]
         private int m_birdCount;
 
         /// <summary>
@@ -20,51 +19,39 @@ namespace FlappyBird
         /// </summary>
         private float[] m_birdResults;
 
-        private List<Genometype> m_historyGenomes;
+        // private List<Genometype> m_historyGenomes;
+        private Genometype m_currentGenome;
 
-        private IBirdOverCallback gameController;
+        private AbstractMLGameControl m_gameController;
         
         public bool AllDead;
 
-        public WeightOptimize(IBirdOverCallback _gameController, int birdCount)
+        public WeightOptimize(AbstractMLGameControl gameController, int birdCount)
         {
             m_birdCount = birdCount;
             m_birds = new GenomeControlBird[birdCount];
             m_birdResults = new float[birdCount];
-            m_historyGenomes = new List<Genometype>();
 
-            gameController = _gameController;
+            m_gameController = gameController;
         }
 
         public void InsertGenome(Genometype genome, bool fullyRandom=true)
         {
-            m_historyGenomes.Add(genome);
+            // m_historyGenomes.Add(genome);
+            m_currentGenome = genome;
 
-            m_birds[0] = GameObject.Instantiate<GenomeControlBird>(gameController.BirdPrefab);
-            // m_birds[i].transform.SetPraent(birdsCollection);
-            m_birds[0].Prepare(gameController, genome);
-
-            for (int i = 1; i < m_birdCount; i++)
-            {
-                m_birds[i] = GameObject.Instantiate<GenomeControlBird>(gameController.BirdPrefab);
-                // m_birds[i].transform.SetPraent(birdsCollection);
-                m_birds[i].Prepare(gameController, ChangeWeightInGenome(genome, fullyRandom: fullyRandom));
-            }
+            PopulateByEvolveFromGenome(fullyRandom: fullyRandom);
         }
 
-        public void PopulateByEvolveFromGenome()
+        public void PopulateByEvolveFromGenome(bool fullyRandom=false)
         {
-            Genometype data = m_historyGenomes[m_historyGenomes.Count - 1];
-
-            m_birds[0] = GameObject.Instantiate<GenomeControlBird>(gameController.BirdPrefab);
-            m_birds[0].Prepare(gameController, data);
-            // m_birds[0].transform.SetParent(.birdsCollection);
+            m_birds[0] = m_gameController.birdPool.Get();
+            m_birds[0].Prepare(m_gameController, m_currentGenome);
 
             for (int i = 1; i < m_birdCount; i++)
             {
-                m_birds[i] = GameObject.Instantiate<GenomeControlBird>(gameController.BirdPrefab);
-                m_birds[i].Prepare(gameController, ChangeWeightInGenome(data));
-                // m_birds[i].transform.SetParent(birdsCollection);
+                m_birds[i] = m_gameController.birdPool.Get();
+                m_birds[i].Prepare(m_gameController, ChangeWeightInGenome(m_currentGenome, fullyRandom: fullyRandom));
             }
         }
 
@@ -89,10 +76,13 @@ namespace FlappyBird
             {
                 if (m_birds[i] == bird)
                 {
-                    m_birdResults[i] = Time.unscaledTime - gameController.GameStartTime;
+                    m_birdResults[i] = Time.unscaledTime - m_gameController.gameStartTime;
                 }
 
-                if (m_birds[i].gameObject.activeSelf) AllDead = false;
+                if (m_birds[i].gameObject.activeSelf)
+                {
+                    AllDead = false;
+                }
             }
         }
 
@@ -108,10 +98,11 @@ namespace FlappyBird
                     bestData = m_birds[i].GenomeData;
                     bestTime = m_birdResults[i];
                 }
-                GameObject.Destroy(m_birds[i].gameObject);
+                // GameObject.Destroy(m_birds[i].gameObject);
             }
 
-            m_historyGenomes.Add(bestData);
+            // m_historyGenomes.Add(bestData);
+            m_currentGenome = bestData;
         }
 
 
@@ -125,7 +116,7 @@ namespace FlappyBird
                 {
                     genomeScore = new GenomeScore(m_birds[i].GenomeData, m_birdResults[i]);
                 }
-                GameObject.Destroy(m_birds[i].gameObject);
+                // GameObject.Destroy(m_birds[i].gameObject);
             }
 
             return genomeScore;

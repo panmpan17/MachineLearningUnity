@@ -5,13 +5,10 @@ using TMPro;
 
 namespace FlappyBird
 {
-    public class GenomeEvolutionGameControl: GameControl, IBirdOverCallback
+    public class GenomeEvolutionGameControl: AbstractMLGameControl
     {
         [Header("Genome Evolution")]
         public Transform birdsCollection;
-
-        public GenomeControlBird birdPrefab;
-        public GenomeControlBird BirdPrefab => birdPrefab;
 
         public int maxGenomeAtATime;
 
@@ -24,23 +21,10 @@ namespace FlappyBird
 
         public int scoreRequire;
 
-        private List<Genometype> m_failedGenomes;
+        // private List<Genometype> m_failedGenomes;
         // private List<Genometype> 
         private List<Genometype> m_aliveGenomes;
         private List<WeightOptimize> m_weightOptimizers;
-
-        /// <summary>
-        /// Record of the time when new batch start
-        /// </summary>
-        private float m_batchStartTime;
-        public float GameStartTime => m_batchStartTime;
-
-        /// <summary>
-        /// The closest ground ahead of the bird
-        /// </summary>
-        private Transform m_cloestGround;
-        public Transform CloestGround  => m_cloestGround;
-
 
         /// <summary>
         /// The minimum x of the ground become irrelevant
@@ -54,7 +38,9 @@ namespace FlappyBird
 
         private void Start()
         {
-            m_failedGenomes = new  List<Genometype>();
+            Physics2D.gravity = new Vector2(0, -9.8f);
+
+            // m_failedGenomes = new  List<Genometype>();
             m_aliveGenomes = new List<Genometype>();
             m_weightOptimizers = new List<WeightOptimize>();
 
@@ -76,8 +62,8 @@ namespace FlappyBird
                     return;
                 }
 
-                m_failedGenomes.AddRange(data.failedGenomes);
-                m_failedGenomes.AddRange(data.aliveGenomes);
+                // m_failedGenomes.AddRange(data.failedGenomes);
+                // m_failedGenomes.AddRange(data.aliveGenomes);
                 m_aliveGenomes.AddRange(data.aliveBirds);
                 m_structureGenerationCount = data.structureGenerationCount;
 
@@ -93,7 +79,7 @@ namespace FlappyBird
                 StartFromScratch();
             }
 
-            m_batchStartTime = Time.unscaledTime;
+            gameStartTime = Time.unscaledTime;
 
             base.ResetGame();
         }
@@ -131,15 +117,15 @@ namespace FlappyBird
             UpdateGround();
 
             // Chose the closest ground
-            m_cloestGround = grounds[0].transform;
-            float bestDistance = m_cloestGround.transform.position.x - x;
+            cloestGround = grounds[0].transform;
+            float bestDistance = cloestGround.position.x - x;
             for (int i = 0; i < grounds.Count; i++)
             {
                 float distance = grounds[i].transform.position.x - x;
                 if (bestDistance < 0 || (distance < bestDistance && distance > 0))
                 {
                     bestDistance = distance;
-                    m_cloestGround = grounds[i].transform;
+                    cloestGround = grounds[i].transform;
                 }
             }
 
@@ -148,7 +134,7 @@ namespace FlappyBird
                 StopTraining();
         }
 
-        public void BirdOver(GenomeControlBird bird)
+        public override void BirdOver(GenomeControlBird bird)
         {
             bool allOver = true;
             for (int i = 0; i < m_weightOptimizers.Count; i++)
@@ -160,7 +146,7 @@ namespace FlappyBird
 
             if (allOver)
             {
-                m_batchStartTime = Time.unscaledTime;
+                gameStartTime = Time.unscaledTime;
                 ResetGame();
             }
         }
@@ -191,7 +177,7 @@ namespace FlappyBird
                 weightGenerationText.text = m_weightGenerationCount.ToString();
             }
 
-            m_batchStartTime = Time.unscaledTime;            
+            gameStartTime = Time.unscaledTime;            
         }
 
         public void DoGenomeMutation()
@@ -205,13 +191,13 @@ namespace FlappyBird
                 WeightOptimize.GenomeScore score = m_weightOptimizers[i].ExtractBestData();
                 if (score.time > bestScore.time)
                 {
-                    if (bestScore.genome != null) m_failedGenomes.Add(bestScore.genome);
+                    // if (bestScore.genome != null) m_failedGenomes.Add(bestScore.genome);
                     bestScore = score;
                 }
-                else
-                {
-                    m_failedGenomes.Add(score.genome);
-                }
+                // else
+                // {
+                    // m_failedGenomes.Add(score.genome);
+                // }
             }
 
             m_aliveGenomes.Clear();
@@ -229,10 +215,10 @@ namespace FlappyBird
                 possibleMutations.Add(mutateController.mutations[i]);
             }
 
-            if (possibleMutations.Count > maxGenomeAtATime - 3)
+            if (possibleMutations.Count > maxGenomeAtATime - 1)
             {
                 ShuffleList<Genometype>(possibleMutations);
-                for (int i = 0; i < maxGenomeAtATime - 3; i++)
+                for (int i = 0; i < maxGenomeAtATime - 1; i++)
                 {
                     m_aliveGenomes.Add(possibleMutations[i]);
                 }
@@ -265,8 +251,8 @@ namespace FlappyBird
             GenomeStructEvolveData storeData = new GenomeStructEvolveData();
 
             storeData.structureGenerationCount = m_structureGenerationCount;
-            storeData.failedGenomes = m_failedGenomes.ToArray();
-            storeData.aliveGenomes = m_aliveGenomes.ToArray();
+            // storeData.failedGenomes = m_failedGenomes.ToArray();
+            // storeData.aliveGenomes = m_aliveGenomes.ToArray();
 
             GenomeControlBird[] birds = FindObjectsOfType<GenomeControlBird>(false);
             storeData.aliveBirds = new Genometype[birds.Length];

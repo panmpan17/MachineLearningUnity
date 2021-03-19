@@ -15,24 +15,12 @@ namespace FlappyBird
         void BirdOver(GenomeControlBird bird);
     }
 
-    public class WeightOptimizeGameController : GameControl, IBirdOverCallback
+    public class WeightOptimizeGameController : AbstractMLGameControl
     {
         [Header("Machine Learning")]
-        public Transform birdsCollection;
-        public GenomeControlBird birdPrefab;
-        public GenomeControlBird BirdPrefab {
-            get { return birdPrefab; }
-        }
-
         public int batchBirdCount;
 
         private WeightOptimize m_weightOptimizer;
-
-        /// <summary>
-        /// The closest ground ahead of the bird
-        /// </summary>
-        private Transform m_cloestGround;
-        public Transform CloestGround { get { return m_cloestGround; } }
 
         /// <summary>
         /// Record of the time when new batch start
@@ -44,8 +32,8 @@ namespace FlappyBird
         }
 
         public int scoreRequire;
-        public float maxnimumGenerationCount;
-        private float m_generationCount;
+        public int maxnimumGenerationCount;
+        private int m_generationCount;
 
         /// <summary>
         /// The minimum x of the ground become irrelevant
@@ -57,6 +45,8 @@ namespace FlappyBird
 
         private void Start()
         {
+            Physics2D.gravity = new Vector2(0, -9.8f);
+
             startText.gameObject.SetActive(false);
 
             // Only populate one bird if for show is on
@@ -64,13 +54,17 @@ namespace FlappyBird
 
 
             // Start new batch of birds, if record file can be load use record genome
-            try {
-                m_weightOptimizer.InsertGenome(SavingSystem.GetGenome<Genometype>(genomeRecordFileName));
-            }
-            catch (System.IO.FileNotFoundException)
+            if (genomeRecordFileName != "")
             {
-                StartFromScratch();
+                try {
+                    m_weightOptimizer.InsertGenome(SavingSystem.GetGenome<Genometype>(genomeRecordFileName));
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                    StartFromScratch();
+                }
             }
+            else StartFromScratch();
             
             m_batchStartTime = Time.unscaledTime;
             base.ResetGame();
@@ -96,26 +90,20 @@ namespace FlappyBird
             m_weightOptimizer.InsertGenome(new Genometype(nodes, connections));
         }
 
-        protected void PopulateByEvolveFromGenome(Genometype data)
-        {
-            m_weightOptimizer.PopulateByEvolveFromGenome();
-            m_generationCount++;
-        }
-
         protected override void Update()
         {
             UpdateGround();
 
             // Chose the closest ground
-            m_cloestGround = grounds[0].transform;
-            float bestDistance = m_cloestGround.transform.position.x - x;
+            cloestGround = grounds[0].transform;
+            float bestDistance = cloestGround.transform.position.x - x;
             for (int i = 0; i < grounds.Count; i++)
             {
                 float distance = grounds[i].transform.position.x - x;
                 if (bestDistance < 0 || (distance < bestDistance && distance > 0))
                 {
                     bestDistance = distance;
-                    m_cloestGround = grounds[i].transform;
+                    cloestGround = grounds[i].transform;
                 }
             }
 
@@ -128,7 +116,7 @@ namespace FlappyBird
         /// Callback from bird
         /// </summary>
         /// <param name="bird"></param>
-        public void BirdOver(GenomeControlBird bird)
+        public override void BirdOver(GenomeControlBird bird)
         {
             m_weightOptimizer.BirdOver(bird);
             if (m_weightOptimizer.AllDead)

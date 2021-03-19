@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NEAT;
+using MPack;
 
 
 namespace FlappyBird
 {
-    public class GenomeControlBird : BirdContoller
+    public class GenomeControlBird : BirdContoller, IPoolableObj
     {
-        private IBirdOverCallback callbackController;
+        private AbstractMLGameControl m_gameController;
         private GenomeController genomeController;
 
         public Genometype GenomeData
@@ -16,16 +17,27 @@ namespace FlappyBird
             get { return genomeController.genome; }
         }
 
-        public void Prepare(IBirdOverCallback _callbackController, Genometype genome)
+        public void Prepare(AbstractMLGameControl _gameController, Genometype genome)
         {
-            callbackController = _callbackController;
+            m_gameController = _gameController;
             genomeController = new GenomeController(genome);
+        }
+
+        protected override void OnEnable()
+        {
+            transform.position = initialPosition;
+            rigidbody2D.simulated = true;
+            // rigidbody2D.velocity = new Vector2(0, jumpVelocity);
+            rigidbody2D.angularVelocity = downwardAngularSpeed;
+            transform.rotation = Quaternion.Euler(0, 0, upwardStopAngle);
         }
 
         void Update()
         {
-            Transform upGround = callbackController.CloestGround.GetChild(0);
-            Transform downGround = callbackController.CloestGround.GetChild(1);
+            if (m_gameController == null) return;
+
+            Transform upGround = m_gameController.cloestGround.GetChild(0);
+            Transform downGround = m_gameController.cloestGround.GetChild(1);
 
             // Insert the inputs
             genomeController.Reset();
@@ -50,8 +62,24 @@ namespace FlappyBird
         protected override void OnCollisionEnter2D(Collision2D other)
         {
             // Callback to the controller, let it know this bird hit ground
+            m_gameController.birdPool.Put(this);
+            m_gameController?.BirdOver(this);
+        }
+
+        public void Instantiate()
+        {
+            OnEnable();
+        }
+
+        public void DeactivateObj(Transform collectionTransform)
+        {
             gameObject.SetActive(false);
-            callbackController?.BirdOver(this);
+        }
+
+        public void Reinstantiate()
+        {
+            gameObject.SetActive(true);
+            OnEnable();
         }
     }
 }

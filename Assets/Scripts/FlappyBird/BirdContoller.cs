@@ -11,21 +11,21 @@ namespace FlappyBird
 
         public float upwardAngularSpeed = 360;
         public float upwardStopAngle;
-        private bool upward;
+        protected bool upward;
         public float downwardAngularSpeed = -180;
 
         protected new Rigidbody2D rigidbody2D;
-        private Vector3 initialPosition;
+        protected Vector3 initialPosition;
 
 
-        private void Awake() {
+        protected virtual void Awake() {
             rigidbody2D = GetComponent<Rigidbody2D>();
             rigidbody2D.simulated = false;
 
             initialPosition = transform.position;
         }
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             transform.position = initialPosition;
             rigidbody2D.simulated = true;
             rigidbody2D.velocity = new Vector2(0, jumpVelocity);
