@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/FlappyBird/WeightOptimization.unity
-    guid: e3f7b815cac7745a88a1a3b78193278f
+    path: Assets/Scenes/FlappyBird/GenomeEvolution.unity
+    guid: e3f859d7f6e52442784ffb20bbdecc36
   m_configObjects: {}

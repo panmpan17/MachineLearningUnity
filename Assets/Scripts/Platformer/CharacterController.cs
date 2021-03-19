@@ -4,100 +4,104 @@ using UnityEngine;
 using MPack;
 
 
-public class CharacterController : MonoBehaviour
+namespace Platformer
 {
-    [SerializeField]
-    private float m_WalkAccelerate, m_WalkDrag, m_WalkMaxSpeed;
-    [SerializeField]
-    private float m_JumpForce, m_JumpSec, m_WaitJumpSec;
-    private float m_JumpTimer;
-
-    private bool m_Jumping, m_LeaveGround;
-
-    private SmartBoxCollider m_BoxCollider;
-    private Rigidbody2D m_Rigidbody2D;
-    private AbstractCharacterInput input;
-
-
-    private void Awake()
+    public class CharacterController : MonoBehaviour
     {
-        m_BoxCollider = GetComponent<SmartBoxCollider>();
-        m_Rigidbody2D = GetComponent<Rigidbody2D>();
-        input = GetComponent<AbstractCharacterInput>();
-    }
+        [SerializeField]
+        private float m_WalkAccelerate, m_WalkDrag, m_WalkMaxSpeed;
+        [SerializeField]
+        private float m_JumpForce, m_JumpSec, m_WaitJumpSec;
+        private float m_JumpTimer;
 
-    private void Update()
-    {
-        Vector2 velocity = m_Rigidbody2D.velocity;
+        private bool m_Jumping, m_LeaveGround;
 
-        #region Walking
-        bool walking = false;
-        if (input.Right)
+        private SmartBoxCollider m_BoxCollider;
+        private Rigidbody2D m_Rigidbody2D;
+        private AbstractCharacterInput input;
+
+
+        private void Awake()
         {
-            walking = true;
-            velocity.x = Mathf.MoveTowards(velocity.x, m_WalkMaxSpeed, m_WalkAccelerate * Time.deltaTime);
-        }
-        if (input.Left)
-        {
-            walking = true;
-            velocity.x = Mathf.MoveTowards(velocity.x, -m_WalkMaxSpeed, m_WalkAccelerate * Time.deltaTime);
+            m_BoxCollider = GetComponent<SmartBoxCollider>();
+            m_Rigidbody2D = GetComponent<Rigidbody2D>();
+            input = GetComponent<AbstractCharacterInput>();
         }
 
-        if (!walking)
-            velocity.x = Mathf.MoveTowards(velocity.x, 0, m_WalkDrag * Time.deltaTime);
-        #endregion
-
-        #region Jumping
-        if (!m_Jumping)
+        private void Update()
         {
-            if (m_BoxCollider.DownTouched && input.Jump)
+            Vector2 velocity = m_Rigidbody2D.velocity;
+
+            #region Walking
+            bool walking = false;
+            if (input.Right)
             {
-                m_Jumping = true;
-                velocity.y = m_JumpForce;
+                walking = true;
+                velocity.x = Mathf.MoveTowards(velocity.x, m_WalkMaxSpeed, m_WalkAccelerate * Time.deltaTime);
             }
-        }
-        else
-        {
-            if (m_LeaveGround)
+            if (input.Left)
             {
-                if (m_BoxCollider.DownTouched)
-                {
-                    m_LeaveGround = false;
-                    m_Jumping = false;
-                    m_JumpTimer = 0;
-                    return;
-                }
+                walking = true;
+                velocity.x = Mathf.MoveTowards(velocity.x, -m_WalkMaxSpeed, m_WalkAccelerate * Time.deltaTime);
             }
-            else if (!m_BoxCollider.DownTouched)
-                m_LeaveGround = true;
 
-            if (m_JumpTimer < m_JumpSec)
+            if (!walking)
+                velocity.x = Mathf.MoveTowards(velocity.x, 0, m_WalkDrag * Time.deltaTime);
+            #endregion
+
+            #region Jumping
+            if (!m_Jumping)
             {
-                bool keepJumping = Input.GetKey(KeyCode.Space);
-                if (keepJumping)
+                if (m_BoxCollider.DownTouched && input.Jump)
                 {
-                    m_JumpTimer += Time.deltaTime;
+                    m_Jumping = true;
                     velocity.y = m_JumpForce;
                 }
-                else
+            }
+            else
+            {
+                if (m_LeaveGround)
                 {
-                    m_JumpTimer = m_JumpSec + 1;
+                    if (m_BoxCollider.DownTouched)
+                    {
+                        m_LeaveGround = false;
+                        m_Jumping = false;
+                        m_JumpTimer = 0;
+                        return;
+                    }
+                }
+                else if (!m_BoxCollider.DownTouched)
+                    m_LeaveGround = true;
+
+                if (m_JumpTimer < m_JumpSec)
+                {
+                    bool keepJumping = Input.GetKey(KeyCode.Space);
+                    if (keepJumping)
+                    {
+                        m_JumpTimer += Time.deltaTime;
+                        velocity.y = m_JumpForce;
+                    }
+                    else
+                    {
+                        m_JumpTimer = m_JumpSec + 1;
+                    }
                 }
             }
+            #endregion
+
+            m_Rigidbody2D.velocity = velocity;
         }
-        #endregion
 
-        m_Rigidbody2D.velocity = velocity;
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("End"))
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            AbstractMachineLearningGameController gameController = FindObjectOfType<AbstractMachineLearningGameController>();
-            if (gameController != null)
+            if (other.CompareTag("End"))
             {
-                gameController.CharacterReachEnd(this);
+                AbstractMachineLearningGameController gameController = FindObjectOfType<AbstractMachineLearningGameController>();
+                Debug.Log(gameController);
+                if (gameController != null)
+                {
+                    gameController.CharacterReachEnd(this);
+                }
             }
         }
     }
