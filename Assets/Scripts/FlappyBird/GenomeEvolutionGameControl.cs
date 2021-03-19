@@ -8,8 +8,6 @@ namespace FlappyBird
     public class GenomeEvolutionGameControl: AbstractMLGameControl
     {
         [Header("Genome Evolution")]
-        public Transform birdsCollection;
-
         public int maxGenomeAtATime;
 
         public int genomeBirdCount;
@@ -19,17 +17,9 @@ namespace FlappyBird
         private int m_weightGenerationCount;
         private int m_structureGenerationCount;
 
-        public int scoreRequire;
-
         // private List<Genometype> m_failedGenomes;
-        // private List<Genometype> 
         private List<Genometype> m_aliveGenomes;
         private List<WeightOptimize> m_weightOptimizers;
-
-        /// <summary>
-        /// The minimum x of the ground become irrelevant
-        /// </summary>
-        public float x;
 
         public TextMeshProUGUI weightGenerationText;
         public TextMeshProUGUI structureGenerationText;
@@ -38,9 +28,6 @@ namespace FlappyBird
 
         private void Start()
         {
-            Physics2D.gravity = new Vector2(0, -9.8f);
-
-            // m_failedGenomes = new  List<Genometype>();
             m_aliveGenomes = new List<Genometype>();
             m_weightOptimizers = new List<WeightOptimize>();
 
@@ -112,28 +99,6 @@ namespace FlappyBird
             }
         }
 
-        protected override void Update()
-        {
-            UpdateGround();
-
-            // Chose the closest ground
-            cloestGround = grounds[0].transform;
-            float bestDistance = cloestGround.position.x - x;
-            for (int i = 0; i < grounds.Count; i++)
-            {
-                float distance = grounds[i].transform.position.x - x;
-                if (bestDistance < 0 || (distance < bestDistance && distance > 0))
-                {
-                    bestDistance = distance;
-                    cloestGround = grounds[i].transform;
-                }
-            }
-
-            // Check is the score reach
-            if (score >= scoreRequire)
-                StopTraining();
-        }
-
         public override void BirdOver(GenomeControlBird bird)
         {
             bool allOver = true;
@@ -177,7 +142,8 @@ namespace FlappyBird
                 weightGenerationText.text = m_weightGenerationCount.ToString();
             }
 
-            gameStartTime = Time.unscaledTime;            
+            gameStartTime = Time.unscaledTime;
+            FindObjectOfType<ToggleRenderers>().ForceEnabled(true);
         }
 
         public void DoGenomeMutation()
@@ -246,7 +212,7 @@ namespace FlappyBird
             }
         }
 
-        public void StopTraining(bool stopApplication=true)
+        public override void StopTraining(bool stopApplication=true)
         {
             GenomeStructEvolveData storeData = new GenomeStructEvolveData();
 

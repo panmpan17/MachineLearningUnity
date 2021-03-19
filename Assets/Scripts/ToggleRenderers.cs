@@ -19,4 +19,10 @@ public class ToggleRenderers : MonoBehaviour
         normalCamera.enabled = !normalCamera.enabled;
         noRenderersCamera.enabled =!noRenderersCamera.enabled;
     }
+
+    public void ForceEnabled(bool enabled)
+    {
+        normalCamera.enabled = !enabled;
+        noRenderersCamera.enabled = enabled;
+    }
 }

@@ -62,7 +62,7 @@ namespace FlappyBird
             for (int i = 0; i < newGenome.connectionGenes.Length; i++)
             {
                 if (fullyRandom) newGenome.connectionGenes[i].weight = Random.Range(-10f, 10f);
-                else newGenome.connectionGenes[i].weight += Random.Range(-1f, 1f);
+                else newGenome.connectionGenes[i].weight += Random.Range(-0.6f, 0.6f);
             }
 
             return newGenome;

@@ -31,7 +31,6 @@ namespace FlappyBird
             get { return m_batchStartTime; }
         }
 
-        public int scoreRequire;
         public int maxnimumGenerationCount;
         private int m_generationCount;
 
@@ -45,8 +44,6 @@ namespace FlappyBird
 
         private void Start()
         {
-            Physics2D.gravity = new Vector2(0, -9.8f);
-
             startText.gameObject.SetActive(false);
 
             // Only populate one bird if for show is on
@@ -90,28 +87,6 @@ namespace FlappyBird
             m_weightOptimizer.InsertGenome(new Genometype(nodes, connections));
         }
 
-        protected override void Update()
-        {
-            UpdateGround();
-
-            // Chose the closest ground
-            cloestGround = grounds[0].transform;
-            float bestDistance = cloestGround.transform.position.x - x;
-            for (int i = 0; i < grounds.Count; i++)
-            {
-                float distance = grounds[i].transform.position.x - x;
-                if (bestDistance < 0 || (distance < bestDistance && distance > 0))
-                {
-                    bestDistance = distance;
-                    cloestGround = grounds[i].transform;
-                }
-            }
-
-            // Check is the score reach
-            if (score >= scoreRequire)
-                StopTraining();
-        }
-
         /// <summary>
         /// Callback from bird
         /// </summary>
@@ -138,7 +113,7 @@ namespace FlappyBird
                 StopTraining();
         }
 
-        public void StopTraining()
+        public override void StopTraining(bool quitApplication=true)
         {
             Genometype genome;
             if (m_weightOptimizer.FindAliveData(out genome))
@@ -146,11 +121,14 @@ namespace FlappyBird
                 SavingSystem.SaveData<Genometype>("best-data", genome);
             }
 
-            // Quit the game
-            Application.Quit();
-            #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-            #endif
+            if (quitApplication)
+            {
+                // Quit the game
+                Application.Quit();
+                #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+                #endif
+            }
         }
     }
 }
