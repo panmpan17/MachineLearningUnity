@@ -34,11 +34,6 @@ namespace FlappyBird
         public int maxnimumGenerationCount;
         private int m_generationCount;
 
-        /// <summary>
-        /// The minimum x of the ground become irrelevant
-        /// </summary>
-        public float x;
-
         public string genomeRecordFileName;
         public bool forShow;
 
@@ -109,7 +104,7 @@ namespace FlappyBird
             m_batchStartTime = Time.unscaledTime;
 
             // Check maximum generation is reach
-            if (m_generationCount >= maxnimumGenerationCount)
+            if (++m_generationCount >= maxnimumGenerationCount)
                 StopTraining();
         }
 
