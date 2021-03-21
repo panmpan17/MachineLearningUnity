@@ -59,6 +59,6 @@ namespace FlappyBird
                 StopTraining();
         }
 
-        public abstract void StopTraining(bool quitApplication=true);
+        public abstract void StopTraining();
     }
 }

@@ -108,21 +108,12 @@ namespace FlappyBird
                 StopTraining();
         }
 
-        public override void StopTraining(bool quitApplication=true)
+        public override void StopTraining()
         {
             Genometype genome;
             if (m_weightOptimizer.FindAliveData(out genome))
             {
                 SavingSystem.SaveData<Genometype>("best-data", genome);
-            }
-
-            if (quitApplication)
-            {
-                // Quit the game
-                Application.Quit();
-                #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-                #endif
             }
         }
     }

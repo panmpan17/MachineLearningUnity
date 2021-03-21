@@ -24,7 +24,8 @@ namespace FlappyBird
         public TextMeshProUGUI weightGenerationText;
         public TextMeshProUGUI structureGenerationText;
 
-        public string recordFileName;
+        public string readFileName;
+        public string saveFileName;
 
         private void Start()
         {
@@ -33,28 +34,23 @@ namespace FlappyBird
 
             startText.gameObject.SetActive(false);
 
-            if (recordFileName != "")
+            if (readFileName != "")
             {
                 GenomeStructEvolveData data;
                 try
                 {
-                    data = SavingSystem.GetGenome<GenomeStructEvolveData>(recordFileName, recordFileName.EndsWith("json"));
+                    data = SavingSystem.GetGenome<GenomeStructEvolveData>(readFileName, readFileName.EndsWith("json"));
                 }
-                catch (System.IO.FileNotFoundException)
-                {
-                    Application.Quit();
-                    #if UNITY_EDITOR
-                    UnityEditor.EditorApplication.isPlaying = false;
-                    #endif
+                catch (System.IO.FileNotFoundException) {
+                    StartFromScratch();
+                    gameStartTime = Time.unscaledTime;
+                    base.ResetGame();
                     return;
                 }
 
-                // m_failedGenomes.AddRange(data.failedGenomes);
-                // m_failedGenomes.AddRange(data.aliveGenomes);
                 m_aliveGenomes.AddRange(data.aliveBirds);
                 m_structureGenerationCount = data.structureGenerationCount;
 
-                // for (int i = 0)
                 for (int i = 0; i < m_aliveGenomes.Count; i++)
                 {
                     m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount));
@@ -212,13 +208,25 @@ namespace FlappyBird
             }
         }
 
-        public override void StopTraining(bool stopApplication=true)
+        public override void StopTraining()
+        {
+            SaveTraining();
+            if (StageController.ins != null) StageController.ins?.StageTraningEnd();
+            else
+            {
+                // Quit the game
+                Application.Quit();
+                #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+                #endif
+            }
+        }
+
+        private void SaveTraining()
         {
             GenomeStructEvolveData storeData = new GenomeStructEvolveData();
 
             storeData.structureGenerationCount = m_structureGenerationCount;
-            // storeData.failedGenomes = m_failedGenomes.ToArray();
-            // storeData.aliveGenomes = m_aliveGenomes.ToArray();
 
             GenomeControlBird[] birds = FindObjectsOfType<GenomeControlBird>(false);
             storeData.aliveBirds = new Genometype[birds.Length];
@@ -228,15 +236,7 @@ namespace FlappyBird
                 storeData.aliveBirds[i] = birds[i].GenomeData;
             }
 
-            SavingSystem.SaveData<GenomeStructEvolveData>("compound-data", storeData);
-
-            if (stopApplication)
-            {
-                Application.Quit();
-                #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-                #endif
-            }
+            SavingSystem.SaveData<GenomeStructEvolveData>(saveFileName, storeData);
         }
 
         [System.Serializable]
