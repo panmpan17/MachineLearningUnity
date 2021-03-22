@@ -34,6 +34,8 @@ namespace FlappyBird
 
             startText.gameObject.SetActive(false);
 
+            if (SavingSystem.DataFileExist(saveFileName)) readFileName = saveFileName;
+
             if (readFileName != "")
             {
                 GenomeStructEvolveData data;

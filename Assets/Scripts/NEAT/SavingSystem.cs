@@ -9,6 +9,11 @@ namespace NEAT
 {
     public class SavingSystem
     {
+        public static bool DataFileExist(string fileName)
+        {
+            return File.Exists(Path.Combine(Application.persistentDataPath, fileName));
+        }
+
         /// <summary>
         /// Store genome in files
         /// </summary>
