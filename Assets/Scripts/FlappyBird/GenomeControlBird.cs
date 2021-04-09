@@ -7,7 +7,7 @@ using MPack;
 
 namespace FlappyBird
 {
-    public class GenomeControlBird : BirdContoller, IPoolableObj
+    public class GenomeControlBird : BirdContoller, IPoolableObj, IGenomeAgent
     {
         private AbstractMLGameControl m_gameController;
         private GenomeController genomeController;
@@ -17,9 +17,9 @@ namespace FlappyBird
             get { return genomeController.genome; }
         }
 
-        public void Prepare(AbstractMLGameControl _gameController, Genometype genome)
+        public void Prepare(ITraningGameControl gameControl, Genometype genome)
         {
-            m_gameController = _gameController;
+            m_gameController = (AbstractMLGameControl) gameControl;
             genomeController = new GenomeController(genome);
         }
 

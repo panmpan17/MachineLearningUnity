@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MPack;
-
+using NEAT;
 
 namespace FlappyBird
 {
-    public abstract class AbstractMLGameControl : GameControl
+    public abstract class AbstractMLGameControl : GameControl, ITraningGameControl
     {
         /// <summary>
         /// The closest ground ahead of the bird
@@ -18,17 +18,14 @@ namespace FlappyBird
         public PrefabPool<GenomeControlBird> birdPool;
 
         /// <summary>
-        /// Record of the time when new batch start
-        /// </summary>
-        [System.NonSerialized]
-        public float gameStartTime;
-
-        /// <summary>
         /// The minimum x of the ground become irrelevant
         /// </summary>
         public float groundRelevantMinmumX;
 
         public int scoreRequire;
+
+        public float GameStartTime => m_gameStartTime;
+        protected float m_gameStartTime;
 
         public abstract void BirdOver(GenomeControlBird bird);
 
@@ -60,5 +57,10 @@ namespace FlappyBird
         }
 
         public abstract void StopTraining();
+
+        public IGenomeAgent GetGenomeControlFromPool()
+        {
+            return birdPool.Get();
+        }
     }
 }

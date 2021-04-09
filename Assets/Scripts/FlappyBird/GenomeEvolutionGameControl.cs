@@ -45,7 +45,7 @@ namespace FlappyBird
                 }
                 catch (System.IO.FileNotFoundException) {
                     StartFromScratch();
-                    gameStartTime = Time.unscaledTime;
+                    m_gameStartTime = Time.unscaledTime;
                     base.ResetGame();
                     return;
                 }
@@ -64,7 +64,7 @@ namespace FlappyBird
                 StartFromScratch();
             }
 
-            gameStartTime = Time.unscaledTime;
+            m_gameStartTime = Time.unscaledTime;
 
             base.ResetGame();
         }
@@ -109,7 +109,7 @@ namespace FlappyBird
 
             if (allOver)
             {
-                gameStartTime = Time.unscaledTime;
+                m_gameStartTime = Time.unscaledTime;
                 ResetGame();
             }
         }
@@ -140,7 +140,7 @@ namespace FlappyBird
                 weightGenerationText.text = m_weightGenerationCount.ToString();
             }
 
-            gameStartTime = Time.unscaledTime;
+            m_gameStartTime = Time.unscaledTime;
             FindObjectOfType<ToggleRenderers>().ForceEnabled(true);
         }
 

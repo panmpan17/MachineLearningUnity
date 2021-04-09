@@ -22,15 +22,6 @@ namespace FlappyBird
 
         private WeightOptimize m_weightOptimizer;
 
-        /// <summary>
-        /// Record of the time when new batch start
-        /// </summary>
-        private float m_batchStartTime;
-        public float GameStartTime
-        {
-            get { return m_batchStartTime; }
-        }
-
         public int maxnimumGenerationCount;
         private int m_generationCount;
 
@@ -58,7 +49,7 @@ namespace FlappyBird
             }
             else StartFromScratch();
             
-            m_batchStartTime = Time.unscaledTime;
+            m_gameStartTime = Time.unscaledTime;
             base.ResetGame();
         }
 
@@ -101,7 +92,7 @@ namespace FlappyBird
             m_weightOptimizer.FindBestData();
             m_weightOptimizer.PopulateByEvolveFromGenome();
 
-            m_batchStartTime = Time.unscaledTime;
+            m_gameStartTime = Time.unscaledTime;
 
             // Check maximum generation is reach
             if (++m_generationCount >= maxnimumGenerationCount)
