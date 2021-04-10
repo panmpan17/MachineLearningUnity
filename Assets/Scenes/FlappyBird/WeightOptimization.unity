@@ -1193,8 +1193,8 @@ MonoBehaviour:
   groundRelevantMinmumX: -1.8
   scoreRequire: 50
   batchBirdCount: 50
+  batchBirdSurviveCount: 10
   maxnimumGenerationCount: 20
-  x: -1.8
   genomeRecordFileName: 
   forShow: 0
 --- !u!4 &1594724059

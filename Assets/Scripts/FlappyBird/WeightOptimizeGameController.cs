@@ -20,6 +20,8 @@ namespace FlappyBird
         [Header("Machine Learning")]
         public int batchBirdCount;
 
+        public int batchBirdSurviveCount;
+
         private WeightOptimize m_weightOptimizer;
 
         public int maxnimumGenerationCount;
@@ -33,7 +35,7 @@ namespace FlappyBird
             startText.gameObject.SetActive(false);
 
             // Only populate one bird if for show is on
-            m_weightOptimizer = new WeightOptimize(this, forShow? 1: batchBirdCount);
+            m_weightOptimizer = new WeightOptimize(this, forShow? 1: batchBirdCount, batchBirdSurviveCount);
 
 
             // Start new batch of birds, if record file can be load use record genome
@@ -90,7 +92,7 @@ namespace FlappyBird
 
             // Prepare new batch
             m_weightOptimizer.FindBestData();
-            m_weightOptimizer.PopulateByEvolveFromGenome();
+            m_weightOptimizer.PopulateByEvolveFromGenome(weightRange: 0.6f);
 
             m_gameStartTime = Time.unscaledTime;
 

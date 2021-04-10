@@ -1369,7 +1369,9 @@ MonoBehaviour:
   groundRelevantMinmumX: -1.9
   scoreRequire: 100
   maxGenomeAtATime: 10
+  genomeSurviveCount: 4
   genomeBirdCount: 80
+  genomeBirdSurviveCount: 10
   genomeMaxGeneration: 23
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}
@@ -1437,7 +1439,9 @@ MonoBehaviour:
   groundRelevantMinmumX: -1.8
   scoreRequire: 100
   maxGenomeAtATime: 30
+  genomeSurviveCount: 8
   genomeBirdCount: 30
+  genomeBirdSurviveCount: 5
   genomeMaxGeneration: 16
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}
@@ -2269,7 +2273,9 @@ MonoBehaviour:
   groundRelevantMinmumX: -1.8
   scoreRequire: 100
   maxGenomeAtATime: 30
+  genomeSurviveCount: 8
   genomeBirdCount: 30
+  genomeBirdSurviveCount: 5
   genomeMaxGeneration: 8
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}

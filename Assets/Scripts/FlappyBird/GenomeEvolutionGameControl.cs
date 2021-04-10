@@ -10,7 +10,11 @@ namespace FlappyBird
         [Header("Genome Evolution")]
         public int maxGenomeAtATime;
 
+        public int genomeSurviveCount;
+
         public int genomeBirdCount;
+
+        public int genomeBirdSurviveCount;
 
         public int genomeMaxGeneration;
 
@@ -55,7 +59,7 @@ namespace FlappyBird
 
                 for (int i = 0; i < m_aliveGenomes.Count; i++)
                 {
-                    m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount));
+                    m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount, genomeBirdSurviveCount));
                     m_weightOptimizers[i].InsertGenome(m_aliveGenomes[i], fullyRandom: false);
                 }
             }
@@ -92,7 +96,7 @@ namespace FlappyBird
 
             for (int i = 0; i < m_aliveGenomes.Count; i++)
             {
-                m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount));
+                m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount, genomeBirdSurviveCount));
                 m_weightOptimizers[i].InsertGenome(m_aliveGenomes[i]);
             }
         }
@@ -133,7 +137,7 @@ namespace FlappyBird
                 for (int i = 0; i < m_weightOptimizers.Count; i++)
                 {
                     m_weightOptimizers[i].FindBestData();
-                    m_weightOptimizers[i].PopulateByEvolveFromGenome();
+                    m_weightOptimizers[i].PopulateByEvolveFromGenome(weightRange: 0.6f);
                 }
 
                 m_weightGenerationCount++;
@@ -146,55 +150,67 @@ namespace FlappyBird
 
         public void DoGenomeMutation()
         {
-            // List<WeightOptimize.GenomeScore> bestScores = new List<WeightOptimize.GenomeScore>();
-            WeightOptimize.GenomeScore bestScore = new WeightOptimize.GenomeScore(null, 0);
+            List<WeightOptimize.GenomeScore> bestScores = new List<WeightOptimize.GenomeScore>();
+            // WeightOptimize.GenomeScore bestScore = new WeightOptimize.GenomeScore(null, 0);
 
             // Find the best 3 genome from the weight optimizers
             for (int i = 0; i < m_weightOptimizers.Count; i++)
             {
                 WeightOptimize.GenomeScore score = m_weightOptimizers[i].ExtractBestData();
-                if (score.time > bestScore.time)
+
+                if (bestScores.Count < genomeSurviveCount)
                 {
-                    // if (bestScore.genome != null) m_failedGenomes.Add(bestScore.genome);
-                    bestScore = score;
+                    bestScores.Add(score);
                 }
-                // else
-                // {
-                    // m_failedGenomes.Add(score.genome);
-                // }
+                else
+                {
+                    for (int e = 0; e < bestScores.Count; e++)
+                    {
+                        if (score.score > bestScores[e].score)
+                        {
+                            bestScores.Insert(e, score);
+                            bestScores.RemoveAt(bestScores.Count - 1);
+                            break;
+                        }
+                    }
+                }
             }
+
+
+            List<Genometype> surviveGenomes = new List<Genometype>();
+            for (int i = 0; i < bestScores.Count; i++)
+                surviveGenomes.Add(bestScores[i].genome);
 
             m_aliveGenomes.Clear();
             m_weightOptimizers.Clear();
 
-            m_aliveGenomes.Add(bestScore.genome);
-
-            GenomeMutationController mutateController = new GenomeMutationController(bestScore.genome);
-            mutateController.MutateByAddingConnection();
-            mutateController.MutateByInsertNodeBetweenConnection();
+            m_aliveGenomes.AddRange(surviveGenomes);
 
             List<Genometype> possibleMutations = new List<Genometype>();
-            for (int i = 0; i < mutateController.mutations.Count; i++)
-            {
-                possibleMutations.Add(mutateController.mutations[i]);
-            }
 
-            if (possibleMutations.Count > maxGenomeAtATime - 1)
+            int genomePerGenome = (maxGenomeAtATime - m_aliveGenomes.Count) / m_aliveGenomes.Count;
+
+            for (int i = 0; i < surviveGenomes.Count; i++)
             {
-                ShuffleList<Genometype>(possibleMutations);
-                for (int i = 0; i < maxGenomeAtATime - 1; i++)
+                GenomeMutationController mutateController = new GenomeMutationController(surviveGenomes[i]);
+                mutateController.MutateByAddingConnection();
+                mutateController.MutateByInsertNodeBetweenConnection();
+
+                if (mutateController.mutations.Count > genomePerGenome)
                 {
-                    m_aliveGenomes.Add(possibleMutations[i]);
+                    ShuffleList<Genometype>(mutateController.mutations);
+                    for (int e = 0; e < genomePerGenome; e++)
+                        m_aliveGenomes.Add(mutateController.mutations[e]);
                 }
-            }
-            else
-            {
-                m_aliveGenomes.AddRange(possibleMutations);
+                else
+                {
+                    m_aliveGenomes.AddRange(mutateController.mutations);
+                }
             }
 
             for (int i = 0; i < m_aliveGenomes.Count; i++)
             {
-                m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount));
+                m_weightOptimizers.Add(new WeightOptimize(this, genomeBirdCount, genomeBirdSurviveCount));
                 m_weightOptimizers[i].InsertGenome(m_aliveGenomes[i], fullyRandom: false);
             }
         }
