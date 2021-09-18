@@ -32,6 +32,8 @@ namespace FlappyBird
         protected override void Awake() {
             birdPool = new PrefabPool<GenomeControlBird>(birdPrefab.GetComponent<GenomeControlBird>());
             Physics2D.gravity = new Vector2(0, -9.8f);
+
+            base.Awake();
         }
 
         protected override void Update()
@@ -61,6 +63,27 @@ namespace FlappyBird
         public IGenomeAgent GetGenomeControlFromPool()
         {
             return birdPool.Get();
+        }
+
+        public void OnDisable()
+        {
+            for (int i = 0; i < groundPools.Length; i++)
+            {
+                groundPools[i].ClearAliveObjs();
+                groundPools[i].ClearPoolObjs();
+            }
+
+
+            for (int i = 0; i < birdPool.AliveObjs.Count; i++)
+            {
+                if (birdPool.AliveObjs[i] != null)
+                    Destroy(birdPool.AliveObjs[i].gameObject);
+            }
+            for (int i = 0; i < birdPool.PoolObjs.Count; i++)
+            {
+                if (birdPool.PoolObjs[i] != null)
+                    Destroy(birdPool.PoolObjs[i].gameObject);
+            }
         }
     }
 }

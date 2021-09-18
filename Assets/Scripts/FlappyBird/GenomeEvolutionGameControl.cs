@@ -54,7 +54,7 @@ namespace FlappyBird
                     return;
                 }
 
-                m_aliveGenomes.AddRange(data.aliveBirds);
+                m_aliveGenomes.AddRange(data.aliveGenomes);
                 m_structureGenerationCount = data.structureGenerationCount;
 
                 for (int i = 0; i < m_aliveGenomes.Count; i++)
@@ -229,7 +229,10 @@ namespace FlappyBird
         public override void StopTraining()
         {
             SaveTraining();
-            if (StageController.ins != null) StageController.ins?.StageTraningEnd();
+            if (StageController.ins != null)
+            {
+                StageController.ins?.StageTraningEnd();
+            }
             else
             {
                 // Quit the game
@@ -246,13 +249,20 @@ namespace FlappyBird
 
             storeData.structureGenerationCount = m_structureGenerationCount;
 
-            GenomeControlBird[] birds = FindObjectsOfType<GenomeControlBird>(false);
-            storeData.aliveBirds = new Genometype[birds.Length];
+            GenomeControlBird[] birds = FindObjectsOfType<GenomeControlBird>(true);
+            List<Genometype> aliveGenomes = new List<Genometype>();
+            List<Genometype> failGenomes = new List<Genometype>();
 
             for (int i = 0; i < birds.Length; i++)
             {
-                storeData.aliveBirds[i] = birds[i].GenomeData;
+                if (birds[i].gameObject.activeSelf)
+                    aliveGenomes.Add(birds[i].GenomeData);
+                else
+                    failGenomes.Add(birds[i].GenomeData);
             }
+
+            storeData.failGenomes = failGenomes.ToArray();
+            storeData.aliveGenomes = aliveGenomes.ToArray();
 
             SavingSystem.SaveData<GenomeStructEvolveData>(saveFileName, storeData);
         }
@@ -261,9 +271,8 @@ namespace FlappyBird
         public struct GenomeStructEvolveData
         {
             public int structureGenerationCount;
-            public Genometype[] failedGenomes;
+            public Genometype[] failGenomes;
             public Genometype[] aliveGenomes;
-            public Genometype[] aliveBirds;
         }
     }
 }

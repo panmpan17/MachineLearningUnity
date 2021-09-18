@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using MPack;
 
 
 namespace FlappyBird
@@ -16,7 +17,8 @@ namespace FlappyBird
 
         [Header("Ground control")]
         [SerializeField]
-        protected GameObject[] groundSetPrefabs;
+        protected GameObjectPrefabPool[] groundPools;
+
         public int spawnCount;
         private int spawnCounting;
         private int groundIndex;
@@ -48,6 +50,9 @@ namespace FlappyBird
 
         protected virtual void Awake() {
             if (birdContoller != null) birdContoller.enabled = false;
+
+            for (int i = 0; i < groundPools.Length; i++)
+                groundPools[i].Initial();
         }
 
         protected virtual void Update()
@@ -97,14 +102,15 @@ namespace FlappyBird
             if (++spawnCounting > spawnCount)
             {
                 spawnCounting = 0;
-                if (++groundIndex >= groundSetPrefabs.Length)
+                if (++groundIndex >= groundPools.Length)
                 {
                     groundIndex = 0;
                 }
             }
 
             // int index = Random.Range(0, groundSetPrefabs.Length);
-            GameObject newGround = Instantiate(groundSetPrefabs[groundIndex]);
+            GameObject newGround = groundPools[groundIndex].Get();
+            newGround.SetActive(true);
 
             Vector3 position = spawnPosition;
             position.y = Random.Range(spawnMinY, spawnMaxY);
