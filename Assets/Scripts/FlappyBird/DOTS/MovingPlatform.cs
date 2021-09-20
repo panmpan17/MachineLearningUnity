@@ -5,4 +5,5 @@ using Unity.Entities;
 public struct MovingPlatform : IComponentData
 {
     public float speed;
+    public float gap;
 }
