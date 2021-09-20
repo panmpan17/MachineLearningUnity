@@ -1023,7 +1023,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &869360724
 Transform:
   m_ObjectHideFlags: 0
@@ -1280,7 +1280,7 @@ MonoBehaviour:
   startText: {fileID: 1569455994}
   scoreText: {fileID: 1742788419}
   birdPrefab: {fileID: 3531945777408210364, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
-  groundRelevantMinmumX: -1.9
+  groundRelevantMinmumX: -2
   scoreRequire: 100
   maxGenomeAtATime: 10
   genomeSurviveCount: 4
@@ -1336,7 +1336,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   birdContoller: {fileID: 0}
   scoreX: -1
-  groundPools: []
+  groundPools:
+  - Prefab: {fileID: 8868567236326683746, guid: 776f98b91a59942918cb13694f41d923, type: 3}
+    PoolCollection: {fileID: 49162287}
+    InitialObjCount: 3
+  - Prefab: {fileID: 8868567236326683746, guid: c13ab38741d3846c4aa9359c49e75cf0, type: 3}
+    PoolCollection: {fileID: 49162287}
+    InitialObjCount: 3
+  - Prefab: {fileID: 8868567236326683746, guid: eebf7ae824d8149378e4deb3d9e1eeda, type: 3}
+    PoolCollection: {fileID: 49162287}
+    InitialObjCount: 3
   spawnCount: 2
   spawnPosition: {x: 7, y: 0, z: 0}
   distroyX: -8
@@ -1347,7 +1356,7 @@ MonoBehaviour:
   startText: {fileID: 1569455994}
   scoreText: {fileID: 1742788419}
   birdPrefab: {fileID: 3531945777408210364, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
-  groundRelevantMinmumX: -1.8
+  groundRelevantMinmumX: -2
   scoreRequire: 100
   maxGenomeAtATime: 30
   genomeSurviveCount: 8
@@ -2185,7 +2194,7 @@ MonoBehaviour:
   startText: {fileID: 1569455994}
   scoreText: {fileID: 1742788419}
   birdPrefab: {fileID: 3531945777408210364, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
-  groundRelevantMinmumX: -1.8
+  groundRelevantMinmumX: -2
   scoreRequire: 100
   maxGenomeAtATime: 30
   genomeSurviveCount: 8

@@ -83,8 +83,6 @@ namespace FlappyBird
                 new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 3),
                 new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 4),
                 new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 5),
-                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 6),
-                new Genometype.NodeGenes(Genometype.NodeGenes.Types.Input, _IOIndex: 7),
                 new Genometype.NodeGenes(Genometype.NodeGenes.Types.Output, _IOIndex: 0),
             };
 

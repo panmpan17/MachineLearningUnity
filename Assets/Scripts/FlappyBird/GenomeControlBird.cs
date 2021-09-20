@@ -42,6 +42,7 @@ namespace FlappyBird
             // Insert the inputs
             genomeController.Reset();
             genomeController.Input(new float[] {
+                transform.position.x,
                 transform.position.y,
                 rigidbody2D.velocity.y,
                 upGround.position.x,
