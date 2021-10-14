@@ -118,7 +118,6 @@ namespace FlappyBird
 
                 node.type = m_genometype.nodeGenes[i].type;
                 node.IOIndex = m_genometype.nodeGenes[i].IOIndex;
-                node.outputMode = m_genometype.nodeGenes[i].outputMode;
 
                 node.position = new Vector2(0, y);
                 y += 150;

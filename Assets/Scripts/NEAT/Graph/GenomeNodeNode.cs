@@ -14,6 +14,5 @@ namespace NEAT.Graph
         
         public Genometype.NodeGenes.Types type;
         public int IOIndex;
-        public Genometype.NodeGenes.OutputMode outputMode;
     }
 }

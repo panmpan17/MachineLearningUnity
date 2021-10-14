@@ -46,15 +46,29 @@ namespace NEAT
                 Genometype.ConnectionGenens connection = m_genome.connectionGenes[i];
                 if (connection.enabled)
                 {
+                    float value;
                     switch (connection.operatorType)
                     {
                         case Genometype.ConnectionGenens.OperatorType.Multiply:
-                            m_genome.nodeGenes[connection.outputNodeIndex].value += 
-                                m_genome.nodeGenes[connection.inputNodeIndex].value * connection.weight;
+                            value = m_genome.nodeGenes[connection.inputNodeIndex].value * connection.weight;
                             break;
                         case Genometype.ConnectionGenens.OperatorType.Plus:
-                            m_genome.nodeGenes[connection.outputNodeIndex].value +=
-                                m_genome.nodeGenes[connection.inputNodeIndex].value + connection.weight;
+                            value = m_genome.nodeGenes[connection.inputNodeIndex].value + connection.weight;
+                            break;
+                        default:
+                            throw new System.NotImplementedException();
+                    }
+
+                    switch (m_genome.nodeGenes[connection.outputNodeIndex].addOnType)
+                    {
+                        case Genometype.NodeGenes.AddOnType.Plus:
+                            m_genome.nodeGenes[connection.outputNodeIndex].value += value;
+                            break;
+                        case Genometype.NodeGenes.AddOnType.Multiply:
+                            if (m_genome.nodeGenes[connection.outputNodeIndex].value == 0)
+                                m_genome.nodeGenes[connection.outputNodeIndex].value = value;
+                            else
+                                m_genome.nodeGenes[connection.outputNodeIndex].value *= value;
                             break;
                     }
                 }
@@ -78,7 +92,7 @@ namespace NEAT
                 {
                     if (outputIndex == outputIndexCount)
                     {
-                        return m_genome.nodeGenes[i].Value;
+                        return m_genome.nodeGenes[i].value;
                     }
                     outputIndexCount++;
                 }

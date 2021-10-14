@@ -18,7 +18,7 @@ namespace NEAT
                 bool matched = true;
                 for (int e = 0; e < genome2.connectionGenes.Length; e++)
                 {
-                    if (genome1.connectionGenes[i].innovationNumber == genome2.connectionGenes[i].innovationNumber)
+                    if (genome1.connectionGenes[i].innovationUUID == genome2.connectionGenes[i].innovationUUID)
                     {
                         matched = true;
                         break;
@@ -74,7 +74,7 @@ namespace NEAT
             // Loop through the nodes, and turn its data into string
             for (int i = 0; i < nodeGenes.Length; i++)
             {
-                data += string.Format("{0} {1}: {2}\n", nodeGenes[i].type, nodeGenes[i].outputMode, nodeGenes[i].value);
+                data += string.Format("{0}: {1}\n", nodeGenes[i].type, nodeGenes[i].addOnType);
             }
 
             data += "\n";
@@ -98,11 +98,6 @@ namespace NEAT
             public Types type;
 
             /// <summary>
-            /// How to output the value
-            /// </summary>
-            public OutputMode outputMode;
-
-            /// <summary>
             /// The input or output index
             /// </summary>
             public int IOIndex;
@@ -113,19 +108,25 @@ namespace NEAT
             [System.NonSerialized]
             public float value;
 
-            public float Value
-            {
-                get {
-                    return outputMode == OutputMode.Normal? value: - value;
-                }
-            }
+            /// <summary>
+            /// UUID of this node, use to line up genome when cross over
+            /// </summary>
+            public string UUID;
 
-            public NodeGenes(Types _type, OutputMode _outputMode=OutputMode.Normal, int _IOIndex=0)
+            /// <summary>
+            /// How the number add on to the original number in this node
+            /// </summary>
+            public AddOnType addOnType;
+
+            public NodeGenes(Types _type, int _IOIndex=0, AddOnType _addOnType=AddOnType.Plus)
             {
                 type = _type;
-                outputMode = _outputMode;
                 IOIndex = _IOIndex;
                 value = 0;
+
+                addOnType = _addOnType;
+
+                UUID = System.Guid.NewGuid().ToString();
             }
 
             public enum Types
@@ -135,18 +136,16 @@ namespace NEAT
                 Hidden,
             }
 
-            public enum OutputMode
+            public enum AddOnType
             {
-                Normal,
-                Reverse
+                Plus,
+                Multiply,
             }
         }
 
         [System.Serializable]
         public struct ConnectionGenens
         {
-            public static int InnovationNumber = 0;
-
             /// <summary>
             /// The index of the input node in the genome
             /// </summary>
@@ -173,9 +172,9 @@ namespace NEAT
             public bool enabled;
 
             /// <summary>
-            /// The innvation number of this connection, use to  line up genome when cross over
+            /// The innvation UUID of this connection, use to line up genome when cross over
             /// </summary>
-            public int innovationNumber;
+            public string innovationUUID;
 
             public ConnectionGenens(int _inputNodeIndex, int _outputNodeIndex, float _weight, OperatorType _operatorType=OperatorType.Multiply, bool _enabled=true)
             {
@@ -185,7 +184,7 @@ namespace NEAT
                 operatorType = _operatorType;
                 enabled = _enabled;
 
-                innovationNumber = InnovationNumber++;
+                innovationUUID = System.Guid.NewGuid().ToString();
             }
 
             public enum OperatorType

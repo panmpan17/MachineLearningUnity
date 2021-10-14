@@ -135,13 +135,22 @@ namespace NEAT
                     secondHalfConnection,
                 });
                 newGenome.connectionGenes[i].enabled = false;
-                
+
+                mutations.Add(newGenome);
+
+                // Second one with multplie add on
+                newNode.addOnType = Genometype.NodeGenes.AddOnType.Multiply;
+                newGenome = MutateGenome(newNode, new Genometype.ConnectionGenens[] {
+                    firstHalfConnection,
+                    secondHalfConnection,
+                });
+                newGenome.connectionGenes[i].enabled = false;
+
                 mutations.Add(newGenome);
             }
 
             return false;
         }
-
 
 
         /// <summary>
