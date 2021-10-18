@@ -8,19 +8,22 @@ namespace NEAT
     [System.Serializable]
     public class Genometype
     {
-        public static bool Compare(Genometype genome1, Genometype genome2)
+        public static bool StructureIsSame(Genometype genome1, Genometype genome2)
         {
             if (genome1.connectionGenes == null || genome2.connectionGenes == null)
                 return genome1.connectionGenes == null && genome2.connectionGenes == null;
+
+            if (genome1.connectionGenes.Length != genome2.connectionGenes.Length)
+                return false;
 
             for (int i = 0; i < genome1.connectionGenes.Length; i++)
             {
                 bool matched = true;
                 for (int e = 0; e < genome2.connectionGenes.Length; e++)
                 {
-                    if (genome1.connectionGenes[i].innovationUUID == genome2.connectionGenes[i].innovationUUID)
+                    if (genome1.connectionGenes[i].innovationUUID != genome2.connectionGenes[i].innovationUUID)
                     {
-                        matched = true;
+                        matched = false;
                         break;
                     }
                 }

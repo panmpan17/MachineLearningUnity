@@ -18,6 +18,7 @@ namespace NEAT
         // protected Genometype m_currentGenome;
 
         protected List<Genometype> m_currentGenomes;
+        protected List<GenomeWeightRecordCollection> m_weightRecordCollection;
 
         protected int m_surviveCount;
 
@@ -30,6 +31,8 @@ namespace NEAT
             m_results = new float[instanceCount];
 
             m_currentGenomes = new List<Genometype>();
+            m_weightRecordCollection = new List<GenomeWeightRecordCollection>();
+
             m_surviveCount = surviveCount;
         }
 
@@ -55,6 +58,13 @@ namespace NEAT
                 instanceIndex++;
                 if (i == m_currentGenomes.Count - 1) i = -1;
             }
+
+            for (int i = 0; i < m_weightRecordCollection.Count; i++)
+            {
+                var collection = m_weightRecordCollection[i];
+                collection.reweightedTime += 1;
+                m_weightRecordCollection[i] = collection;
+            }
         }
 
         protected Genometype ChangeWeightInGenome(Genometype genome, bool fullyRandom=false, float weightRange=1f)
@@ -69,5 +79,75 @@ namespace NEAT
 
             return newGenome;
         }
+
+        protected void AddWeightRecord(Genometype genometype, float score)
+        {
+            bool genomtypeFound = false;
+            for (int i = 0; i < m_weightRecordCollection.Count; i++)
+            {
+                if (Genometype.StructureIsSame(m_weightRecordCollection[i].genometype, genometype))
+                {
+                    m_weightRecordCollection[i].records.Add(new GenomeWeightRecord {
+                        weights = ExtractWeights(genometype),
+                        score = score,
+                    });
+
+                    genomtypeFound = true;
+                    break;
+                }
+            }
+
+            if (!genomtypeFound)
+            {
+                m_weightRecordCollection.Add(new GenomeWeightRecordCollection {
+                    genometype = genometype,
+                    reweightedTime = 0,
+                    records = new List<GenomeWeightRecord>(new GenomeWeightRecord[] {
+                        new GenomeWeightRecord
+                        {
+                            weights = ExtractWeights(genometype),
+                            score = score,
+                        }
+                    })
+                });
+            }
+        }
+
+        protected static float[] ExtractWeights(Genometype genometype)
+        {
+            float[] weights = new float[genometype.connectionGenes.Length];
+
+            for (int i = 0; i < genometype.connectionGenes.Length; i++)
+            {
+                weights[i] = genometype.connectionGenes[i].weight;
+            }
+
+            return weights;
+        }
+
+        public void SaveRecord(string folder)
+        {
+            SavingSystem.CreateFolder(folder);
+            for (int i = 0; i < m_weightRecordCollection.Count; i++)
+            {
+                string path = folder + "/" + i + ".json";
+                SavingSystem.SaveData<GenomeWeightRecordCollection>(path, m_weightRecordCollection[i], true);
+            }
+        }
+    }
+
+    [System.Serializable]
+    public struct GenomeWeightRecordCollection
+    {
+        public Genometype genometype;
+        public int reweightedTime;
+        public List<GenomeWeightRecord> records;
+    }
+
+    [System.Serializable]
+    public struct GenomeWeightRecord
+    {
+        public float[] weights;
+        public float score;
     }
 }

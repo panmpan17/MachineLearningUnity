@@ -33,6 +33,8 @@ namespace FlappyBird
 
         private void Start()
         {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
             m_aliveGenomes = new List<Genometype>();
             m_weightOptimizers = new List<WeightOptimize>();
 
@@ -56,6 +58,7 @@ namespace FlappyBird
 
                 m_aliveGenomes.AddRange(data.aliveGenomes);
                 m_structureGenerationCount = data.structureGenerationCount;
+                structureGenerationText.text = m_structureGenerationCount.ToString();
 
                 for (int i = 0; i < m_aliveGenomes.Count; i++)
                 {
@@ -154,6 +157,8 @@ namespace FlappyBird
             // Find the best 3 genome from the weight optimizers
             for (int i = 0; i < m_weightOptimizers.Count; i++)
             {
+                m_weightOptimizers[i].SaveRecord("generation-" + m_structureGenerationCount);
+
                 WeightOptimize.GenomeScore score = m_weightOptimizers[i].ExtractBestData();
 
                 if (bestScores.Count < genomeSurviveCount)
@@ -254,7 +259,14 @@ namespace FlappyBird
             for (int i = 0; i < birds.Length; i++)
             {
                 if (birds[i].gameObject.activeSelf)
+                {
                     aliveGenomes.Add(birds[i].GenomeData);
+
+                    for (int e = 0; e < m_weightOptimizers.Count; e++)
+                    {
+                        m_weightOptimizers[e].BirdOver(birds[e]);
+                    }
+                }
                 else
                     failGenomes.Add(birds[i].GenomeData);
             }
@@ -263,6 +275,11 @@ namespace FlappyBird
             storeData.aliveGenomes = aliveGenomes.ToArray();
 
             SavingSystem.SaveData<GenomeStructEvolveData>(saveFileName, storeData);
+
+            for (int i = 0; i < m_weightOptimizers.Count; i++)
+            {
+                m_weightOptimizers[i].SaveRecord("generation-" + m_structureGenerationCount);
+            }
         }
 
         [System.Serializable]

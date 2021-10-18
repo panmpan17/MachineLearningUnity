@@ -30,6 +30,7 @@ namespace FlappyBird
                 if (m_instances[i] == bird)
                 {
                     m_results[i] = Time.unscaledTime - m_gameControl.GameStartTime;
+                    AddWeightRecord(m_instances[i].GenomeData, m_results[i]);
                 }
 
                 if (m_instances[i].gameObject.activeSelf)

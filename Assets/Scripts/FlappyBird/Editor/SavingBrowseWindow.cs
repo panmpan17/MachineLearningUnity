@@ -59,11 +59,43 @@ namespace FlappyBird
             }
         }
 
+        public void ConvertToJson(int index)
+        {
+            string filePath = Path.Combine(Application.persistentDataPath, m_files[index]);
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+            if (File.Exists(filePath))
+            {
+                FileStream stream = new FileStream(filePath, FileMode.Open);
+                m_data = (GenomeEvolutionGameControl.GenomeStructEvolveData)binaryFormatter.Deserialize(stream);
+                stream.Close();
+
+                SavingSystem.SaveData<GenomeEvolutionGameControl.GenomeStructEvolveData>(m_files[index] + ".json", m_data, true);
+            }
+        }
+
         void OnGUI()
         {
             for (int i = 0; i < m_files.Length; i++)
             {
                 EditorGUILayout.LabelField(m_files[i]);
+
+                EditorGUILayout.BeginHorizontal();
+
+                if (GUILayout.Button("Open"))
+                {
+                    m_index = i;
+                    GetFileData();
+                }
+
+                if (GUILayout.Button("Convert To JSON"))
+                {
+                    ConvertToJson(i);
+                    // m_index = i;
+                    // GetFileData();
+                }
+
+                EditorGUILayout.EndHorizontal();
             }
             GUILayout.Space(5);
 

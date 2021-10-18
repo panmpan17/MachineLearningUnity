@@ -1269,8 +1269,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   birdContoller: {fileID: 0}
   scoreX: -1
-  groundPools: []
-  spawnCount: 2
+  groundPools:
+  - Prefab: {fileID: 8868567236326683746, guid: 776f98b91a59942918cb13694f41d923, type: 3}
+    PoolCollection: {fileID: 49162287}
+    InitialObjCount: 3
+  - Prefab: {fileID: 8868567236326683746, guid: c13ab38741d3846c4aa9359c49e75cf0, type: 3}
+    PoolCollection: {fileID: 49162287}
+    InitialObjCount: 3
+  - Prefab: {fileID: 8868567236326683746, guid: eebf7ae824d8149378e4deb3d9e1eeda, type: 3}
+    PoolCollection: {fileID: 49162287}
+    InitialObjCount: 3
+  spawnCount: 10
   spawnPosition: {x: 7, y: 0, z: 0}
   distroyX: -8
   moveSpeed: -3
@@ -1284,12 +1293,12 @@ MonoBehaviour:
   scoreRequire: 100
   maxGenomeAtATime: 10
   genomeSurviveCount: 4
-  genomeBirdCount: 80
-  genomeBirdSurviveCount: 10
-  genomeMaxGeneration: 23
+  genomeBirdCount: 28
+  genomeBirdSurviveCount: 8
+  genomeMaxGeneration: 30
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}
-  readFileName: compound-data-stage-2
+  readFileName: 
   saveFileName: compound-data-stage-3
 --- !u!4 &1018501389
 Transform:
@@ -2196,11 +2205,11 @@ MonoBehaviour:
   birdPrefab: {fileID: 3531945777408210364, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
   groundRelevantMinmumX: -2
   scoreRequire: 100
-  maxGenomeAtATime: 30
-  genomeSurviveCount: 8
-  genomeBirdCount: 30
+  maxGenomeAtATime: 25
+  genomeSurviveCount: 4
+  genomeBirdCount: 15
   genomeBirdSurviveCount: 5
-  genomeMaxGeneration: 8
+  genomeMaxGeneration: 6
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}
   readFileName: 
@@ -2518,8 +2527,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stages:
   - {fileID: 1594724057}
-  - {fileID: 1068566860}
-  - {fileID: 1018501387}
   stageButtonPrefab: {fileID: 440962847409829537, guid: 54ce178537ece4e4683c5d071046bdb8, type: 3}
   autoToggleButton: {fileID: 847260747}
 --- !u!1 &2032321699

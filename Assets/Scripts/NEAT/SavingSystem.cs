@@ -14,6 +14,11 @@ namespace NEAT
             return File.Exists(Path.Combine(Application.persistentDataPath, fileName));
         }
 
+        public static void CreateFolder(string folderName)
+        {
+            System.IO.Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, folderName));
+        }
+
         /// <summary>
         /// Store genome in files
         /// </summary>
