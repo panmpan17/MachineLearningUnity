@@ -852,7 +852,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 900, y: 1600}
+  m_ReferenceResolution: {x: 225, y: 400}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1177,9 +1177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   birdContoller: {fileID: 3531945777408210358, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
   scoreX: -1
-  groundSetPrefabs:
-  - {fileID: 8868567236326683746, guid: 776f98b91a59942918cb13694f41d923, type: 3}
-  - {fileID: 8868567236326683746, guid: c13ab38741d3846c4aa9359c49e75cf0, type: 3}
+  groundPools: []
   spawnCount: 5
   spawnPosition: {x: 7, y: 0, z: 0}
   distroyX: -8
