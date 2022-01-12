@@ -88,6 +88,18 @@ namespace FlappyBird
             return genomeScore;
         }
 
+        public GenomeScore[] GetAllDatas()
+        {
+            GenomeScore[] genomeScores = new GenomeScore[m_instanceCount];
+
+            for (int i = 0; i < m_instanceCount; i++)
+            {
+                genomeScores[i] = new GenomeScore(m_instances[i].GenomeData, m_results[i]);
+            }
+
+            return genomeScores;
+        }
+
         public bool FindAliveData(out Genometype genome)
         {
             for (int i = 0; i < m_instances.Length; i++)

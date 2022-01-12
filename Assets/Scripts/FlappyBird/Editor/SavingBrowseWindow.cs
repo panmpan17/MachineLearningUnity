@@ -20,13 +20,12 @@ namespace FlappyBird
         }
 
         private string[] m_files;
-        private int m_index;
+        private int m_index = -1;
         private GenomeEvolutionGameControl.GenomeStructEvolveData m_data;
 
         void OnEnable()
         {
             FindAvalibleFiles();
-            GetFileData();
         }
 
         public void FindAvalibleFiles()
@@ -37,9 +36,6 @@ namespace FlappyBird
             for (int i = 0; i < files.Length; i++)
             {
                 string fileName = files[i].Replace(Application.persistentDataPath, "").Substring(1);
-                if (fileName.IndexOf(".") >= 0)
-                    continue;
-
                 fileList.Add(fileName);
             }
 
@@ -49,13 +45,13 @@ namespace FlappyBird
         public void GetFileData()
         {
             string filePath = Path.Combine(Application.persistentDataPath, m_files[m_index]);
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
 
-            if (File.Exists(filePath))
+            try {
+                m_data = SavingSystem.ReadData<GenomeEvolutionGameControl.GenomeStructEvolveData>(filePath, m_files[m_index].EndsWith(".json"));
+            }
+            catch (System.Exception)
             {
-                FileStream stream = new FileStream(filePath, FileMode.Open);
-                m_data = (GenomeEvolutionGameControl.GenomeStructEvolveData)binaryFormatter.Deserialize(stream);
-                stream.Close();
+                m_index = -1;
             }
         }
 
@@ -91,21 +87,22 @@ namespace FlappyBird
                 if (GUILayout.Button("Convert To JSON"))
                 {
                     ConvertToJson(i);
-                    // m_index = i;
-                    // GetFileData();
                 }
 
                 EditorGUILayout.EndHorizontal();
             }
             GUILayout.Space(5);
 
-            for (int i = 0; i < m_data.aliveGenomes.Length; i++)
+            if (m_data.aliveGenomes != null)
             {
-                EditorGUILayout.LabelField(i.ToString());
-                if (GUILayout.Button("Open graph"))
+                for (int i = 0; i < m_data.aliveGenomes.Length; i++)
                 {
-                    GenometypeGraphVisualizer visualizer = new GenometypeGraphVisualizer(m_data.aliveGenomes[i]);
-                    visualizer.Start();
+                    EditorGUILayout.LabelField(i.ToString());
+                    if (GUILayout.Button("Open graph"))
+                    {
+                        GenometypeGraphVisualizer visualizer = new GenometypeGraphVisualizer(m_data.aliveGenomes[i]);
+                        visualizer.Export("Genome-" + i, true);
+                    }
                 }
             }
         }
@@ -122,15 +119,18 @@ namespace FlappyBird
             m_genometype = genometype;
         }
 
-        public void Start()
+        public void Export(string fileName, bool withoutConnectionNode=false)
         {
             // Initialize graph
             m_graph = ScriptableObject.CreateInstance<GenometypeGraph>();
-            AssetDatabase.CreateAsset(m_graph, "Assets/New Genometype Graph.asset");
+            AssetDatabase.CreateAsset(m_graph, "Assets/" + fileName + ".asset");
             AssetDatabase.SaveAssets();
 
             GenerateNodeGenes();
-            GenerateConnectionGenes();
+            if (withoutConnectionNode)
+                GenerateConnectionGenes();
+            else
+                GenerateConnectionGenesWithoutConnectionNode();
 
             AssetDatabase.SaveAssets();
             EditorUtility.FocusProjectWindow();
@@ -200,6 +200,26 @@ namespace FlappyBird
 
                 if (!string.IsNullOrEmpty(AssetDatabase.GetAssetPath(m_graph)))
                     AssetDatabase.AddObjectToAsset(node, m_graph);
+            }
+        }
+
+        void GenerateConnectionGenesWithoutConnectionNode()
+        {
+            for (int i = 0; i < m_genometype.connectionGenes.Length; i++)
+            {
+                Node.graphHotfix = m_graph;
+                Genometype.ConnectionGenens genens = m_genometype.connectionGenes[i];
+
+                Vector2 position = new Vector2(250, 0);
+
+                if (genens.inputNodeIndex != -1 && genens.outputNodeIndex != -1)
+                {
+                    Node firstNode = m_graph.nodes[genens.inputNodeIndex];
+                    Node secondNode = m_graph.nodes[genens.outputNodeIndex];
+                    firstNode.GetOutputPort("outputData").Connect(secondNode.GetInputPort("inputData"));
+
+                    secondNode.position.x += 250;
+                }
             }
         }
     }

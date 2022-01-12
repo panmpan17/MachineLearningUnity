@@ -10,12 +10,25 @@ public class AdvanceMutationTest
     [Test]
     public void CalculateRedundant()
     {
-        var data = SavingSystem.GetGenome<GenomeEvolutionGameControl.GenomeStructEvolveData>("compound-data-stage-3.json", true);
+        GenomeEvolutionGameControl.GenomeStructEvolveData data = SavingSystem.ReadData<GenomeEvolutionGameControl.GenomeStructEvolveData>("compound-data-stage-3.json", true);
         Genometype genometype = data.aliveGenomes[0];
-        Debug.Log(genometype.nodeGenes.Length);
-        Debug.Log(genometype.connectionGenes.Length);
-        Debug.Log(GenomtypeEvaluator.CountDisabledConnections(genometype));
-        Debug.Log(GenomtypeEvaluator.CountRepeatedConnections(genometype));
+        // Debug.Log(genometype.nodeGenes.Length);
+        // Debug.Log(genometype.connectionGenes.Length);
+        // Debug.Log(GenomtypeEvaluator.CountDisabledConnections(genometype));
+        // Debug.Log(GenomtypeEvaluator.CountRepeatedConnections(genometype));
+
+        int needRemove = GenomtypeEvaluator.CountWasteConnection(genometype);
+        Genometype.ConnectionGenens[] newConnections = new Genometype.ConnectionGenens[genometype.connectionGenes.Length - needRemove];
+        for (int i = 0; i < newConnections.Length; i++)
+        {
+            newConnections[i] = genometype.connectionGenes[i];
+            Debug.LogFormat("{0} -> {1}", newConnections[i].inputNodeIndex, newConnections[i].outputNodeIndex);
+        }
+        genometype.connectionGenes = newConnections;
+
+        GenometypeGraphVisualizer visualizer = new GenometypeGraphVisualizer(genometype);
+        visualizer.Export("trim-connection", false);
+        // genometype.connectionGenes = 
     }
 
     public static class GenomtypeEvaluator
@@ -58,6 +71,22 @@ public class AdvanceMutationTest
                         genometype.connectionGenes[i].outputNodeIndex
                     }));
                 }
+            }
+
+            return count;
+        }
+    
+        public static int CountWasteConnection(Genometype genometype)
+        {
+            int count = 0;
+
+            for (int i = genometype.connectionGenes.Length - 1; i >= 0; i--)
+            {
+                if (genometype.nodeGenes[genometype.connectionGenes[i].outputNodeIndex].type == Genometype.NodeGenes.Types.Output)
+                {
+                    break;
+                }
+                count++;
             }
 
             return count;

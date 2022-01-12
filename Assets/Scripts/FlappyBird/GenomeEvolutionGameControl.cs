@@ -8,15 +8,20 @@ namespace FlappyBird
     public class GenomeEvolutionGameControl: AbstractMLGameControl
     {
         [Header("Genome Evolution")]
+        // Maxnimize genome count
         public int maxGenomeAtATime;
 
+        // How many genome structure will survive in selection
         public int genomeSurviveCount;
 
+        // How many bird in one genome
         public int genomeBirdCount;
 
+        // How many bird survive when weight optimizing
         public int genomeBirdSurviveCount;
 
-        public int genomeMaxGeneration;
+        // How many round weight optimizer runs
+        public int weightMaxGeneration;
 
         private int m_weightGenerationCount;
         private int m_structureGenerationCount;
@@ -47,7 +52,7 @@ namespace FlappyBird
                 GenomeStructEvolveData data;
                 try
                 {
-                    data = SavingSystem.GetGenome<GenomeStructEvolveData>(readFileName, readFileName.EndsWith("json"));
+                    data = SavingSystem.ReadData<GenomeStructEvolveData>(readFileName, readFileName.EndsWith("json"));
                 }
                 catch (System.IO.FileNotFoundException) {
                     StartFromScratch();
@@ -123,7 +128,7 @@ namespace FlappyBird
         {
             base.ResetGame();
 
-            if (m_weightGenerationCount >= genomeMaxGeneration)
+            if (m_weightGenerationCount >= weightMaxGeneration)
             {
                 DoGenomeMutation();
                 m_weightGenerationCount = 0;
@@ -149,9 +154,11 @@ namespace FlappyBird
             FindObjectOfType<ToggleRenderers>().ForceEnabled(true);
         }
 
+        // Do mutation after max gerneration count is reached
         public void DoGenomeMutation()
         {
-            List<WeightOptimize.GenomeScore> bestScores = new List<WeightOptimize.GenomeScore>();
+            List<WeightOptimize.GenomeScore> bestGenome = new List<WeightOptimize.GenomeScore>();
+            List<Genometype> bestFromGenome = new List<Genometype>();
             // WeightOptimize.GenomeScore bestScore = new WeightOptimize.GenomeScore(null, 0);
 
             // Find the best 3 genome from the weight optimizers
@@ -160,19 +167,21 @@ namespace FlappyBird
                 m_weightOptimizers[i].SaveRecord("generation-" + m_structureGenerationCount);
 
                 WeightOptimize.GenomeScore score = m_weightOptimizers[i].ExtractBestData();
+                // WeightOptimize.GenomeScore[] scores = m_weightOptimizers[i].GetAllDatas();
 
-                if (bestScores.Count < genomeSurviveCount)
+                bestFromGenome.Add(score.genome);
+                if (bestGenome.Count < genomeSurviveCount)
                 {
-                    bestScores.Add(score);
+                    bestGenome.Add(score);
                 }
                 else
                 {
-                    for (int e = 0; e < bestScores.Count; e++)
+                    for (int e = 0; e < bestGenome.Count; e++)
                     {
-                        if (score.score > bestScores[e].score)
+                        if (score.score > bestGenome[e].score)
                         {
-                            bestScores.Insert(e, score);
-                            bestScores.RemoveAt(bestScores.Count - 1);
+                            bestGenome.Insert(e, score);
+                            bestGenome.RemoveAt(bestGenome.Count - 1);
                             break;
                         }
                     }
@@ -180,22 +189,23 @@ namespace FlappyBird
             }
 
 
-            List<Genometype> surviveGenomes = new List<Genometype>();
-            for (int i = 0; i < bestScores.Count; i++)
-                surviveGenomes.Add(bestScores[i].genome);
+            // List<Genometype> surviveGenomes = new List<Genometype>();
+            // for (int i = 0; i < bestGenome.Count; i++)
+            //     surviveGenomes.Add(bestGenome[i].genome);
 
             m_aliveGenomes.Clear();
             m_weightOptimizers.Clear();
 
-            m_aliveGenomes.AddRange(surviveGenomes);
+            // m_aliveGenomes.AddRange(surviveGenomes);
 
             List<Genometype> possibleMutations = new List<Genometype>();
 
-            int genomePerGenome = (maxGenomeAtATime - m_aliveGenomes.Count) / m_aliveGenomes.Count;
+            int genomePerGenome = maxGenomeAtATime / bestFromGenome.Count;
 
-            for (int i = 0; i < surviveGenomes.Count; i++)
+            // Mutate every genome
+            for (int i = 0; i < bestFromGenome.Count; i++)
             {
-                GenomeMutationController mutateController = new GenomeMutationController(surviveGenomes[i]);
+                GenomeMutationController mutateController = new GenomeMutationController(bestFromGenome[i]);
                 mutateController.MutateByAddingConnection();
                 mutateController.MutateByInsertNodeBetweenConnection();
 
@@ -209,6 +219,12 @@ namespace FlappyBird
                 {
                     m_aliveGenomes.AddRange(mutateController.mutations);
                 }
+            }
+
+            // Plug back the best weight from all genome
+            for (int i = 0; i < bestGenome.Count; i++)
+            {
+                m_aliveGenomes.Add(bestGenome[i].genome);
             }
 
             for (int i = 0; i < m_aliveGenomes.Count; i++)
