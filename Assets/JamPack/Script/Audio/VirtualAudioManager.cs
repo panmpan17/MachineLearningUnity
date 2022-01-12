@@ -213,7 +213,7 @@ namespace MPack {
 
             while (time < fadeTime) {
                 yield return null;
-                time += Time.deltaTime;
+                time += TimeControl.deltaTime;
                 src.volume = Mathf.Lerp(originVolume, targetVolume, time / fadeTime);
             }
 

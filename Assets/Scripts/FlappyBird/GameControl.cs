@@ -66,7 +66,7 @@ namespace FlappyBird
 
         protected void UpdateGround()
         {
-            spawnTimer += Time.deltaTime;
+            spawnTimer += TimeControl.deltaTime;
             if (spawnTimer >= spawnGap)
                 SpawnGround();
 
@@ -75,7 +75,8 @@ namespace FlappyBird
                 Vector3 position = grounds[i].transform.position;
                 bool cross = position.x <= scoreX;
 
-                position.x += moveSpeed * Time.deltaTime;
+                Debug.Log(TimeControl.deltaTime);
+                position.x += moveSpeed * TimeControl.deltaTime;
 
                 if (!cross && position.x <= scoreX)
                 {

@@ -37,16 +37,16 @@ namespace Platformer
             if (input.Right)
             {
                 walking = true;
-                velocity.x = Mathf.MoveTowards(velocity.x, m_WalkMaxSpeed, m_WalkAccelerate * Time.deltaTime);
+                velocity.x = Mathf.MoveTowards(velocity.x, m_WalkMaxSpeed, m_WalkAccelerate * TimeControl.deltaTime);
             }
             if (input.Left)
             {
                 walking = true;
-                velocity.x = Mathf.MoveTowards(velocity.x, -m_WalkMaxSpeed, m_WalkAccelerate * Time.deltaTime);
+                velocity.x = Mathf.MoveTowards(velocity.x, -m_WalkMaxSpeed, m_WalkAccelerate * TimeControl.deltaTime);
             }
 
             if (!walking)
-                velocity.x = Mathf.MoveTowards(velocity.x, 0, m_WalkDrag * Time.deltaTime);
+                velocity.x = Mathf.MoveTowards(velocity.x, 0, m_WalkDrag * TimeControl.deltaTime);
             #endregion
 
             #region Jumping
@@ -78,7 +78,7 @@ namespace Platformer
                     bool keepJumping = Input.GetKey(KeyCode.Space);
                     if (keepJumping)
                     {
-                        m_JumpTimer += Time.deltaTime;
+                        m_JumpTimer += TimeControl.deltaTime;
                         velocity.y = m_JumpForce;
                     }
                     else

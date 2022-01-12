@@ -27,7 +27,7 @@ public class TimeController : MonoBehaviour
         {
             recalculateTimer = 0;
 
-            int FPS = Mathf.RoundToInt(1 / Time.deltaTime);
+            int FPS = Mathf.RoundToInt(1 / TimeControl.deltaTime);
 
             timeScale = FPS / targetFPS;
             if (timeScale > timeScaleCap) timeScale = timeScaleCap;

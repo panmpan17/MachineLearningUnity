@@ -26,7 +26,6 @@ namespace Platformer
 
                 m_weightOptimizer.FindBestData();
                 m_weightOptimizer.Repopulate();
-                Debug.Log("repopulate");
             }
         }
 
@@ -51,7 +50,6 @@ namespace Platformer
 
         public override void CharacterReachEnd(CharacterController character)
         {
-            Debug.Log("the end");
             m_weightOptimizer.CharacterReachEnd(character);
             // m_weightOptimizer.Repopulate();
         }

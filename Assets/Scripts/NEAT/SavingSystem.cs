@@ -47,7 +47,7 @@ namespace NEAT
         /// <param name="fileName">The name of the file</param>
         /// <param name="useJson">Use json format to read the data</param>
         /// <returns>The genome structure</returns>
-        public static T GetGenome<T>(string fileName, bool useJson=false)
+        public static T ReadData<T>(string fileName, bool useJson=false)
         {
             if (useJson)
             {

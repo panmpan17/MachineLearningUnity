@@ -68,7 +68,7 @@ namespace MPack {
         }
 
         /// <summary>
-        /// Run time add Time.deltaTime, return weather run time reached target time
+        /// Run time add TimeControl.deltaTime, return weather run time reached target time
         /// </summary>
         /// <value></value>
         public bool UpdateEnd
@@ -76,11 +76,11 @@ namespace MPack {
             get
             {
                 if (ReverseMode) {
-                    RunTime -= Time.deltaTime;
+                    RunTime -= TimeControl.deltaTime;
                     return RunTime <= 0;
                 }
                 else {
-                    RunTime += Time.deltaTime;
+                    RunTime += TimeControl.deltaTime;
                     return RunTime >= TargetTime;
                 }
             }
@@ -95,7 +95,7 @@ namespace MPack {
                         return false;
                     else
                     {
-                        RunTime -= Time.deltaTime;
+                        RunTime -= TimeControl.deltaTime;
                         return true;
                     }
                 }
@@ -105,7 +105,7 @@ namespace MPack {
                         return false;
                     else
                     {
-                        RunTime += Time.deltaTime;
+                        RunTime += TimeControl.deltaTime;
                         return true;
                     }
                 }

@@ -1291,11 +1291,11 @@ MonoBehaviour:
   birdPrefab: {fileID: 3531945777408210364, guid: 78b01920463d84d79b1cd8399857abfc, type: 3}
   groundRelevantMinmumX: -2
   scoreRequire: 100
-  maxGenomeAtATime: 10
+  maxGenomeAtATime: 20
   genomeSurviveCount: 4
-  genomeBirdCount: 28
-  genomeBirdSurviveCount: 8
-  genomeMaxGeneration: 30
+  genomeBirdCount: 15
+  genomeBirdSurviveCount: 5
+  genomeMaxGeneration: 10
   weightGenerationText: {fileID: 1761693136}
   structureGenerationText: {fileID: 714164015}
   readFileName: 
@@ -2526,7 +2526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stages:
-  - {fileID: 1594724057}
+  - {fileID: 1018501387}
   stageButtonPrefab: {fileID: 440962847409829537, guid: 54ce178537ece4e4683c5d071046bdb8, type: 3}
   autoToggleButton: {fileID: 847260747}
 --- !u!1 &2032321699

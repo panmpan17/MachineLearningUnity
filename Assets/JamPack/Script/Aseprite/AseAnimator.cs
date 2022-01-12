@@ -28,7 +28,7 @@ namespace MPack.Aseprite {
             if (stop)
                 return;
 
-            timer += Time.deltaTime;
+            timer += TimeControl.deltaTime;
             if (timer > animations[animI].Points[animKeyI].Time) {
                 timer = 0;
                 animKeyI++;

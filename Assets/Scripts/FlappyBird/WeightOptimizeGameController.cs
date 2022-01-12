@@ -42,7 +42,7 @@ namespace FlappyBird
             if (genomeRecordFileName != "")
             {
                 try {
-                    m_weightOptimizer.InsertGenome(SavingSystem.GetGenome<Genometype>(genomeRecordFileName));
+                    m_weightOptimizer.InsertGenome(SavingSystem.ReadData<Genometype>(genomeRecordFileName));
                 }
                 catch (System.IO.FileNotFoundException)
                 {
